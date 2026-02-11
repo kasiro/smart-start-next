@@ -41,7 +41,6 @@ if exists("./out"):
             mkdir(kasiro_start_page_path)
             move("./out/_next", kasiro_start_page_path)
             move("./out/favicon.ico", f"{kasiro_start_page_path}/favicon.ico")
-            # replace paths in index.html
             index_ = get_file("./out/index.html")
             index_ = index_.replace("/_next", "/kasiro_start_page/_next")
             create_file("./out/index.html", index_)

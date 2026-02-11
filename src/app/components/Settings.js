@@ -151,10 +151,7 @@ export default function Settings({
       siteGroups,
       customIcons,
       primaryColor,
-      wallpaper:
-        wallpaper.type === "image" && wallpaper.value.startsWith("data:")
-          ? { type: "none", value: "", opacity: wallpaper.opacity }
-          : wallpaper,
+      wallpaper,
       wallpapers,
       customWallpapers,
       searchEngines,
@@ -200,8 +197,9 @@ export default function Settings({
           setCustomIcons(importedSettings.customIcons);
         if (importedSettings.primaryColor)
           setPrimaryColor(importedSettings.primaryColor);
-        if (importedSettings.wallpaper)
+        if (importedSettings.wallpaper) {
           setWallpaper(importedSettings.wallpaper);
+        }
         if (importedSettings.wallpapers)
           setWallpapers(importedSettings.wallpapers);
         if (importedSettings.customWallpapers)
@@ -214,8 +212,9 @@ export default function Settings({
           setTabLayout(importedSettings.tabLayout);
         if (importedSettings.panelBlur)
           setPanelBlur(importedSettings.panelBlur);
-        if (importedSettings.themePresets)
+        if (importedSettings.themePresets) {
           setThemePresets(importedSettings.themePresets);
+        }
 
         setImportExportStatus("Настройки успешно импортированы");
       } catch (error) {

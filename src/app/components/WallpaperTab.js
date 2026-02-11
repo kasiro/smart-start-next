@@ -16,7 +16,7 @@ export default function WallpaperTab({
   setWallpaperUrl,
 }) {
   return (
-    <div className="fixed inset-0 z-40 overflow-y-auto">
+    <div className="fixed inset-0 z-40 overflow-y-auto my-5 rounded-lg">
       <div className="min-h-screen bg_blur_5">
         <div className="sticky bg-white dark:bg-black-900 bg_blur_5 top-2 rounded-lg mt-2 m-4 z-10 p-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-black dark:text-white">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export default function ThemePresets({
   themePresets,
@@ -32,6 +32,21 @@ export default function ThemePresets({
     setThemePresets([...themePresets, newPreset]);
     setNewPresetName("");
   };
+
+  // Вычисляем ID активного пресета
+  const activePresetId = useMemo(() => {
+    return (
+      themePresets.find(
+        (preset) =>
+          wallpaper.type === preset.wallpaper.type &&
+          wallpaper.value === preset.wallpaper.value &&
+          wallpaper.opacity === preset.wallpaper.opacity &&
+          primaryColor.hue === preset.primaryColor.hue &&
+          primaryColor.saturation === preset.primaryColor.saturation &&
+          primaryColor.lightness === preset.primaryColor.lightness,
+      )?.id || null
+    );
+  }, [wallpaper, primaryColor, themePresets]);
 
   return (
     <div className="settings-panel lg:col-span-2">
@@ -71,12 +86,7 @@ export default function ThemePresets({
           <div key={preset.id} className="relative group">
             <div
               className={`p-4 rounded-lg border transition-all cursor-pointer ${
-                wallpaper.type === preset.wallpaper.type &&
-                wallpaper.value === preset.wallpaper.value &&
-                wallpaper.opacity === preset.wallpaper.opacity &&
-                primaryColor.hue === preset.primaryColor.hue &&
-                primaryColor.saturation === preset.primaryColor.saturation &&
-                primaryColor.lightness === preset.primaryColor.lightness
+                activePresetId === preset.id
                   ? "border-primary-500 ring-2 ring-primary-500/20"
                   : "border-slate-200 dark:border-dark-600 hover:border-slate-300 dark:hover:border-dark-500"
               }`}
@@ -98,16 +108,11 @@ export default function ThemePresets({
                     <i className="fas fa-image text-2xl"></i>
                   </div>
                 )}
-                {wallpaper.type === preset.wallpaper.type &&
-                  wallpaper.value === preset.wallpaper.value &&
-                  wallpaper.opacity === preset.wallpaper.opacity &&
-                  primaryColor.hue === preset.primaryColor.hue &&
-                  primaryColor.saturation === preset.primaryColor.saturation &&
-                  primaryColor.lightness === preset.primaryColor.lightness && (
-                    <div className="absolute top-2 left-2 bg-primary-500 text-white dark:text-white text-xs px-2 py-1 rounded-md">
-                      Активно
-                    </div>
-                  )}
+                {activePresetId === preset.id && (
+                  <div className="absolute top-2 left-2 bg-primary-500 text-white dark:text-white text-xs px-2 py-1 rounded-md">
+                    Активно
+                  </div>
+                )}
               </div>
 
               <div className="flex items-start justify-between gap-2">
