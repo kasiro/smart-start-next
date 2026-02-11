@@ -30,8 +30,12 @@ export default function SearchInput({
 
   useEffect(() => {
     const handleFocus = () => {
+      // Проверяем, является ли устройство мобильным
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
       const dockBar = document.querySelector(".dock-bar");
-      if (dockBar) {
+
+      // На мобильных устройствах не скрываем dock-панель
+      if (dockBar && !isMobile) {
         dockBar.classList.add("dock-bar-hidden");
       }
     };

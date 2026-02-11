@@ -3,7 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { getIcon } from "../../lib/utils";
 
-export default function DockBar({ activeTab, setActiveTab, siteGroups }) {
+export default function DockBar({
+  activeTab,
+  setActiveTab,
+  siteGroups,
+  tabLayout,
+}) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const moreMenuRef = useRef(null);
@@ -79,8 +84,8 @@ export default function DockBar({ activeTab, setActiveTab, siteGroups }) {
     <div
       className="dock-bar"
       style={{
-        // Используем position: sticky для всех устройств, чтобы dock bar плавал при скролле
-        position: "sticky",
+        // Используем position: fixed для всех устройств, чтобы dock bar всегда оставался на месте
+        position: "fixed",
         bottom: "0",
         // Убираем margin-bottom, чтобы избежать проблем с безопасной зоной
         marginBottom: "0",

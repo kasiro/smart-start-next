@@ -203,6 +203,35 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
+
+        /* Оптимизация для GPU */
+        transform: translateZ(0);
+        will-change: transform;
+        contain: paint;
+    }
+
+    /* На мобильных устройствах используем scroll вместо fixed для лучшей совместимости */
+    @media (max-width: 768px) {
+        .wallpaper-overlay {
+            background-attachment: scroll;
+            /* Дополнительные оптимизации для мобильных */
+            transform: translateZ(0);
+            will-change: transform;
+            contain: paint;
+            /* Убираем возможные сдвиги при скроллинге */
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+    }
+
+    /* Альтернативное решение для iOS Safari */
+    @supports (-webkit-touch-callout: none) {
+        .wallpaper-overlay {
+            background-attachment: scroll;
+            transform: translateZ(0);
+            will-change: transform;
+            contain: paint;
+        }
     }
 
     /* Основной контент */

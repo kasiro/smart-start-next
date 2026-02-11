@@ -703,8 +703,6 @@ export default function Home() {
       <div
         className="max-w-6xl mx-auto p-5"
         style={{
-          // Убираем transform и willChange которые могут вызывать проблемы с фиксированным фоном
-          // minHeight оставляем для корректной работы layout
           minHeight: "100vh",
         }}
       >
@@ -831,6 +829,7 @@ export default function Home() {
                   activeTab={activeTab}
                   setActiveTab={setActiveTab}
                   siteGroups={siteGroups}
+                  tabLayout={tabLayout}
                 />
               )}
             </div>
