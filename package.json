@@ -1,0 +1,30 @@
+{
+  "name": "smart-start-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify",
+    "dev:css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify && npm run dev",
+    "build:css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify && npm run build"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-brands-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.24",
+    "eslint": "9.39.2",
+    "eslint-config-next": "16.1.6",
+    "gh-pages": "^6.3.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19"
+  }
+}
