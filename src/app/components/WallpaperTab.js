@@ -62,7 +62,7 @@ export default function WallpaperTab({
               <span>по ссылке</span>
             </button>
             <button
-              className="md:block text-black dark:text-white hidden flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-slate-200 dark:bg-dark-800"
+              className="md:block text-black dark:text-white hidden flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-slate-200 dark:bg-dark-800 hover:bg-white dark:hover:bg-dark-700"
               onClick={() => updateWallpaper("none", "")}
             >
               <i className="fas fa-ban mr-2"></i>

@@ -56,6 +56,7 @@ export default function Settings({
   const [importExportStatus, setImportExportStatus] = useState(null);
   const [newSearchEngineName, setNewSearchEngineName] = useState("");
   const [newSearchEngineUrl, setNewSearchEngineUrl] = useState("");
+  const [refreshStorageMonitor, setRefreshStorageMonitor] = useState(0);
 
   const cleanupOldData = () => {
     // Очистка старых данных из localStorage
@@ -217,6 +218,9 @@ export default function Settings({
         }
 
         setImportExportStatus("Настройки успешно импортированы");
+
+        // Обновляем показатели StorageMonitor
+        setRefreshStorageMonitor((prev) => prev + 1);
       } catch (error) {
         console.error("Ошибка импорта настроек:", error);
         setImportExportStatus(`Ошибка: ${error.message}`);
@@ -274,6 +278,7 @@ export default function Settings({
         setCustomWallpapers={setCustomWallpapers}
         wallpapers={wallpapers}
         setWallpapers={setWallpapers}
+        refreshTrigger={refreshStorageMonitor}
       />
 
       <div className="settings-panel">
@@ -742,7 +747,7 @@ export default function Settings({
                 {group.sites.map((site) => (
                   <div
                     key={site.id}
-                    className="flex items-center gap-2 bg-white dark:bg-dark-700 px-3 py-2 rounded-lg cursor-pointer"
+                    className="flex items-center gap-2 bg-white dark:bg-dark-700 dark:hover:bg-dark-800 px-3 py-2 rounded-lg cursor-pointer"
                   >
                     <div
                       className="flex items-center gap-3 text-primary-500"

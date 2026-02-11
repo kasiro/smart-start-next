@@ -9,6 +9,7 @@ export default function StorageMonitor({
   setCustomWallpapers,
   setWallpapers,
   wallpapers,
+  refreshTrigger,
 }) {
   const [usage, setUsage] = useState({ used: 0, total: 0, percent: 0 });
 
@@ -32,7 +33,7 @@ export default function StorageMonitor({
     calculateUsage();
     window.addEventListener("storage", calculateUsage);
     return () => window.removeEventListener("storage", calculateUsage);
-  }, [customWallpapers, themePresets]);
+  }, [customWallpapers, themePresets, refreshTrigger]);
 
   return (
     <div className="settings-panel">

@@ -703,10 +703,8 @@ export default function Home() {
       <div
         className="max-w-6xl mx-auto p-5"
         style={{
-          // Добавляем оптимизации для прокрутки на мобильных устройствах
-          transform: "translateZ(0)",
-          willChange: "transform",
-          // Ограничиваем высоту для предотвращения проблем с прокруткой
+          // Убираем transform и willChange которые могут вызывать проблемы с фиксированным фоном
+          // minHeight оставляем для корректной работы layout
           minHeight: "100vh",
         }}
       >
@@ -802,7 +800,7 @@ export default function Home() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                minHeight: "100vh",
+                minHeight: "100%",
               }}
             >
               <MainContent

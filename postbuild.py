@@ -1,4 +1,4 @@
-from os import mkdir, remove
+from os import mkdir
 from os.path import exists
 from shutil import move, rmtree
 from subprocess import run
@@ -26,8 +26,8 @@ build_path = "./out"
 kasiro_start_page_path = "./out/kasiro_start_page"
 git_path = "./out/.git"
 
-if exists("./out"):
-    rmtree("./out")
+if exists(build_path):
+    rmtree(build_path)
     print("build folder deleted...")
     # rebuild
     next_config = get_file("./next.config.mjs")
@@ -47,11 +47,11 @@ if exists("./out"):
             print("path replaced kasiro_start_page/_next")
             print("generated kasiro_start_page/_next")
 
-    if "-n" in argv:
-        if not exists("./out/.nojekyll"):
-            create_file("./out/.nojekyll", "false")
-    elif exists("./out/.nojekyll"):
-        remove("./out/.nojekyll")
+    # if "-n" in argv:
+    if not exists("./out/.nojekyll"):
+        create_file("./out/.nojekyll", "false")
+    # elif exists("./out/.nojekyll"):
+    #     remove("./out/.nojekyll")
 
     if "-d" in argv:
         if exists(git_path):

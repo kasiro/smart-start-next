@@ -4,9 +4,11 @@ import { useEffect, useRef, useCallback } from "react";
 
 export default function WallpaperOverlay({ wallpaper, darkMode }) {
   const overlayRef = useRef(null);
+  const imageRef = useRef(null);
 
   const updateWallpaperStyle = useCallback(() => {
     const overlay = overlayRef.current;
+    const img = imageRef.current;
     if (!overlay) return;
 
     // Сбрасываем стили перед установкой новых
@@ -22,25 +24,7 @@ export default function WallpaperOverlay({ wallpaper, darkMode }) {
         overlay.style.opacity = "0";
       }
     } else if (wallpaper.type === "image") {
-      // Для мобильных устройств используем более производительную стратегию
-      const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-      if (isMobile) {
-        // На мобильных устройствах используем background-attachment: scroll для лучшей производительности
-        overlay.style.backgroundImage = `url("${wallpaper.value}")`;
-        overlay.style.backgroundSize = "cover";
-        overlay.style.backgroundPosition = "center";
-        overlay.style.backgroundRepeat = "no-repeat";
-        overlay.style.backgroundAttachment = "scroll"; // Изменяем на scroll для мобильных устройств
-      } else {
-        // На десктопах можно использовать fixed
-        overlay.style.backgroundImage = `url("${wallpaper.value}")`;
-        overlay.style.backgroundSize = "cover";
-        overlay.style.backgroundPosition = "center";
-        overlay.style.backgroundRepeat = "no-repeat";
-        overlay.style.backgroundAttachment = "fixed";
-      }
-
+      // На всех устройствах используем img элемент для стабильного отображения
       overlay.style.opacity = wallpaper.opacity;
     }
   }, [wallpaper, darkMode]);
@@ -74,13 +58,29 @@ export default function WallpaperOverlay({ wallpaper, darkMode }) {
         height: "100%",
         zIndex: -1,
         transition: "opacity 1s ease",
-        // Добавляем оптимизации для производительности
-        transform: "translateZ(0)", // Активирует аппаратное ускорение
-        willChange: "opacity", // Подсказывает браузеру, что свойство будет меняться
-        // Оптимизация для мобильных устройств
-        WebkitTransform: "translateZ(0)", // Дополнительная оптимизация для Safari
-        MozTransform: "translateZ(0)", // Дополнительная оптимизация для Firefox
+        overflow: "hidden",
       }}
-    />
+    >
+      {wallpaper.type === "image" && (
+        <img
+          ref={imageRef}
+          src={wallpaper.value}
+          alt=""
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            // Фиксируем изображение для предотвращения дёргания при скролле
+            transform: "translateZ(0)",
+            willChange: "transform",
+          }}
+          draggable={false}
+        />
+      )}
+    </div>
   );
 }
