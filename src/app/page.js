@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import SearchInput from "./components/SearchInput";
-import DockBar from "./components/DockBar";
+import ResponsiveDock from "./components/ResponsiveDock";
 import Settings from "./components/Settings";
 import WallpaperTab from "./components/WallpaperTab";
 import MainContent from "./components/MainContent";
@@ -825,7 +825,7 @@ export default function Home() {
               />
 
               {tabLayout === "dock" && siteGroups.length > 0 && (
-                <DockBar
+                <ResponsiveDock
                   activeTab={activeTab}
                   setActiveTab={setActiveTab}
                   siteGroups={siteGroups}

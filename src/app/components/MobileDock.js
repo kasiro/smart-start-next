@@ -3,29 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { getIcon } from "../../lib/utils";
 
-export default function DockBar({
+export default function MobileDock({
   activeTab,
   setActiveTab,
   siteGroups,
   tabLayout,
 }) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const moreMenuRef = useRef(null);
-
-  // Определяем, является ли устройство мобильным
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkIsMobile);
-    };
-  }, []);
 
   const tabs = [
     { id: "all", name: "Все", icon: "bookmark" },
@@ -84,7 +69,7 @@ export default function DockBar({
     <div
       className="dock-bar"
       style={{
-        // Используем position: fixed для всех устройств, чтобы dock bar всегда оставался на месте
+        // Используем position: fixed для мобильных устройств
         position: "fixed",
         bottom: "0",
         // Убираем margin-bottom, чтобы избежать проблем с безопасной зоной
