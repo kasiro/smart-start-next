@@ -34,7 +34,7 @@ if exists("./out"):
     if "// output" in next_config:
         next_config = next_config.replace('// output: "export",', 'output: "export",')
         create_file("./next.config.mjs", next_config)
-    execute(["npm", "run", "build"], project_path=".")
+    execute(["npm", "run", "build:css"], project_path=".")
 
     if "-k" in argv:
         if not exists(kasiro_start_page_path):
@@ -77,7 +77,7 @@ if exists("./out"):
         execute(["git", "branch", "-M", "test"])
         execute(["git", "add", "."])
         execute(["git", "commit", "-m", message])
-        execute(["git", "push", "-u", "origin", "test"])
+        execute(["git", "push", "-f", "-u", "origin", "test"])
     elif exists(git_path):
         rmtree(git_path)
 
