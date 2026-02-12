@@ -22,10 +22,10 @@ def execute(command: list[str], project_path: str = "."):
     run(command, cwd=project_path, check=True)
 
 
-message = "PushAuto"
-
 if "-m" in argv:
     message = argv[argv.index("-m") + 1]
+else:
+    message = "PushAuto"
 
 if "-f" in argv:
     files = argv[argv.index("-f") + 1 :][0]
