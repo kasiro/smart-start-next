@@ -26,17 +26,21 @@ build_path = "./out"
 kasiro_start_page_path = "./out/kasiro_start_page"
 git_path = "./out/.git"
 
+# delete build folder if exists
 if exists(build_path):
     rmtree(build_path)
     print("build folder deleted...")
 
-# rebuild
+# uncomment export mode
 next_config = get_file("./next.config.mjs")
 if "// output" in next_config:
     next_config = next_config.replace('// output: "export",', 'output: "export",')
     create_file("./next.config.mjs", next_config)
+
+# generate css and rebuild (npm run build:css)
 execute(["npm", "run", "build:css"], project_path=".")
 
+# replace pathes for production in index.html
 if "-k" in argv:
     if not exists(kasiro_start_page_path):
         mkdir(kasiro_start_page_path)
@@ -48,12 +52,14 @@ if "-k" in argv:
         print("path replaced kasiro_start_page/_next")
         print("generated kasiro_start_page/_next")
 
+# create if not exists .nojekyll file (echo "false" > .nojekyll)
 # if "-n" in argv:
 if not exists("./out/.nojekyll"):
     create_file("./out/.nojekyll", "false")
 # elif exists("./out/.nojekyll"):
 #     remove("./out/.nojekyll")
 
+# init, add files, and push to test branch repository
 if "-d" in argv:
     if exists(git_path):
         rmtree(git_path)
@@ -81,10 +87,12 @@ if "-d" in argv:
 elif exists(git_path):
     rmtree(git_path)
 
+# comment export mode
 next_config = get_file("./next.config.mjs")
 if 'output: "export",' in next_config and "//" not in next_config:
     next_config = next_config.replace('output: "export",', '// output: "export",')
     create_file("./next.config.mjs", next_config)
 
+# delete build folder if exists
 if exists(build_path):
     rmtree(build_path)
