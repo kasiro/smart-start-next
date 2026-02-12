@@ -794,13 +794,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                minHeight: "100%",
-              }}
-            >
+            <div className="flex flex-col min-h-[100%]">
               <MainContent
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
