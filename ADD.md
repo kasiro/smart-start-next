@@ -15,4 +15,4 @@
   - добавить keymaps для переключения между столами?
 
 Телефон:
-- добавить loader пока не загрузятся/пнименятся данные из localStorage
+- добавить loader пока не загрузятся/пнименятся данные из localStorage (см: https://chat.deepseek.com/share/imp835qay2ef64vdih)
