@@ -1,9 +1,12 @@
-import "./globals.css";
+"use client";
 
-export const metadata = {
-  title: "Smart Start Page",
-  description: "A smart start page with customizable bookmarks and themes",
-};
+import "./globals.css";
+import { ThemeProvider } from "next-themes";
+
+// export const metadata = {
+//   title: "Smart Start Page",
+//   description: "A smart start page with customizable bookmarks and themes",
+// };
 
 export default function RootLayout({ children }) {
   return (
@@ -15,32 +18,41 @@ export default function RootLayout({ children }) {
               (function() {
                 try {
                   // Загружаем тему из localStorage
-                  var savedDarkMode = localStorage.getItem('darkMode')
-                  if (savedDarkMode && JSON.parse(savedDarkMode)) {
+                  const savedDarkMode = localStorage.getItem('darkMode')
+                  if (savedDarkMode === 'true') {
                     document.documentElement.classList.add('dark')
                   } else {
                     document.documentElement.classList.remove('dark')
                   }
 
-                  var primaryColor = localStorage.getItem('primaryColor')
+                  const primaryColor = localStorage.getItem('primaryColor')
                   if (primaryColor) {
                     try {
-                      var color = JSON.parse(primaryColor)
-                      document.documentElement.style.setProperty('--primary-hue', color.hue || 250)
-                      document.documentElement.style.setProperty('--primary-saturation', (color.saturation || 79) + '%')
-                      document.documentElement.style.setProperty('--primary-lightness', (color.lightness || 59) + '%')
-                    } catch(e) {
-                      console.error('Ошибка парсинга primaryColor:', e)
-                    }
+                      const color = JSON.parse(primaryColor)
+                      const hue = color.hue || 250
+                      const saturation = color.saturation || 79
+                      const lightness = color.lightness || 59
+
+                      document.documentElement.style.setProperty('--primary-hue', hue)
+                      document.documentElement.style.setProperty('--primary-saturation', saturation + '%')
+                      document.documentElement.style.setProperty('--primary-lightness', lightness + '%')
+
+                      // Устанавливаем акцентный цвет как основной цвет, но с немного увеличенной насыщенностью и яркостью
+                      // для лучшей видимости элементов интерфейса
+                      const accentSaturation = Math.min(saturation + 20, 100) // Увеличиваем насыщенность, но не больше 100%
+                      const accentLightness = Math.min(lightness + 10, 100) // Увеличиваем яркость, но не больше 100%
+
+                      document.documentElement.style.setProperty('--accent-hue', hue)
+                      document.documentElement.style.setProperty('--accent-saturation', accentSaturation + '%')
+                      document.documentElement.style.setProperty('--accent-lightness', accentLightness + '%')
+                    } catch(e) {}
                   }
 
-                  var panelBlur = localStorage.getItem('panelBlur')
+                  const panelBlur = localStorage.getItem('panelBlur')
                   if (panelBlur) {
                     document.documentElement.style.setProperty('--panel-blur', panelBlur + 'px')
                   }
-                } catch (e) {
-                  console.error('Ошибка загрузки темы:', e)
-                }
+                } catch (e) {}
               })()
             `,
           }}
@@ -54,7 +66,16 @@ export default function RootLayout({ children }) {
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

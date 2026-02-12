@@ -12,6 +12,7 @@ import IconManager from "./components/IconManager";
 import GroupModal from "./components/GroupModal";
 import SiteModal from "./components/SiteModal";
 import FullscreenWallpaper from "./components/FullscreenWallpaper";
+import Loader from "./components/Loader";
 import {
   compressImage,
   checkStorageLimit,
@@ -42,6 +43,7 @@ export default function Home() {
   const [searchHistory, setSearchHistory] = useState([]);
   const [tabLayout, setTabLayout] = useState("tabs");
   const [panelBlur, setPanelBlur] = useState(10);
+  const [isLoading, setIsLoading] = useState(true); // Состояние загрузки
 
   // Модальные окна
   const [showGroupModal, setShowGroupModal] = useState(false);
@@ -113,22 +115,43 @@ export default function Home() {
 
   // Инициализация
   useEffect(() => {
-    initializeLocalStorage({
-      setDarkMode,
-      setPrimaryColor,
-      setWallpaper,
-      setSiteGroups,
-      setCustomIcons,
-      setTabLayout,
-      setSearchHistory,
-      setPanelBlur,
-      setSearchEngines,
-      setCurrentSearchEngine,
-      setWallpapers,
-      setCustomWallpapers,
-      setHiddenCategories,
-      setThemePresets,
-      setColorPresets,
+    // Устанавливаем начальное состояние загрузки
+    setIsLoading(true);
+
+    // Оборачиваем initializeLocalStorage в Promise для корректного завершения
+    const loadFromLocalStorage = () => {
+      return new Promise((resolve) => {
+        try {
+          initializeLocalStorage({
+            setDarkMode,
+            setPrimaryColor,
+            setWallpaper,
+            setSiteGroups,
+            setCustomIcons,
+            setTabLayout,
+            setSearchHistory,
+            setPanelBlur,
+            setSearchEngines,
+            setCurrentSearchEngine,
+            setWallpapers,
+            setCustomWallpapers,
+            setHiddenCategories,
+            setThemePresets,
+            setColorPresets,
+          });
+
+          // Немедленно разрешаем промис, так как initializeLocalStorage синхронный
+          resolve();
+        } catch (error) {
+          console.error("Ошибка при инициализации из localStorage:", error);
+          resolve(); // В любом случае разрешаем промис, чтобы не зависло
+        }
+      });
+    };
+
+    // Выполняем инициализацию и устанавливаем isLoading в false только после завершения
+    loadFromLocalStorage().then(() => {
+      setIsLoading(false);
     });
   }, []);
 
@@ -698,237 +721,245 @@ export default function Home() {
   // Основной рендер
   return (
     <>
-      <WallpaperOverlay wallpaper={wallpaper} darkMode={darkMode} />
+      {/* Показываем лоадер, если данные еще загружаются */}
+      {isLoading && <Loader />}
 
-      <div
-        className="max-w-6xl mx-auto p-5"
-        style={{
-          minHeight: "100vh",
-        }}
-      >
-        {showWallpaperTab ? (
-          <WallpaperTab
-            onClose={() => setShowWallpaperTab(false)}
-            wallpaper={wallpaper}
-            setWallpaper={setWallpaper}
-            wallpapers={wallpapers}
-            customWallpapers={customWallpapers}
-            addWallpaper={addWallpaper}
-            updateWallpaper={updateWallpaper}
-            removeWallpaper={removeWallpaper}
-            removeCustomWallpaper={removeCustomWallpaper}
-            setFullscreenWallpaper={setFullscreenWallpaper}
-            setShowUrlModal={setShowUrlModal}
-            wallpaperUrl={wallpaperUrl}
-            setWallpaperUrl={setWallpaperUrl}
-          />
-        ) : showSettings ? (
-          <Settings
-            onClose={() => setShowSettings(false)}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            primaryColor={primaryColor}
-            setPrimaryColor={setPrimaryColor}
-            wallpaper={wallpaper}
-            setWallpaper={setWallpaper}
-            siteGroups={siteGroups}
-            setSiteGroups={setSiteGroups}
-            customIcons={customIcons}
-            setCustomIcons={setCustomIcons}
-            tabLayout={tabLayout}
-            setTabLayout={setTabLayout}
-            setShowWallpaperTab={setShowWallpaperTab}
-            panelBlur={panelBlur}
-            setPanelBlur={setPanelBlur}
-            searchEngines={searchEngines}
-            setSearchEngines={setSearchEngines}
-            currentSearchEngine={currentSearchEngine}
-            setCurrentSearchEngine={setCurrentSearchEngine}
-            colorPresets={colorPresets}
-            setColorPresets={setColorPresets}
-            updatePrimaryColor={updatePrimaryColor}
-            updateWallpaperOpacity={updateWallpaperOpacity}
-            generateId={generateId}
-            addSearchEngine={addSearchEngine}
-            removeSearchEngine={removeSearchEngine}
-            openAddGroupForm={openAddGroupForm}
-            openEditGroupForm={openEditGroupForm}
-            deleteGroup={deleteGroup}
-            setShowIconManager={setShowIconManager}
-            openEditSiteForm={openEditSiteForm}
-            deleteSite={deleteSite}
-            openAddSiteForm={openAddSiteForm}
-            themePresets={themePresets}
-            setThemePresets={setThemePresets}
-            newPresetName={newPresetName}
-            setNewPresetName={setNewPresetName}
-            updatePresetName={updatePresetName}
-            editingPresetId={editingPresetId}
-            setEditingPresetId={setEditingPresetId}
-            applyThemePreset={applyThemePreset}
-            removeThemePreset={removeThemePreset}
-            wallpapers={wallpapers}
-            setWallpapers={setWallpapers}
-            customWallpapers={customWallpapers}
-            setCustomWallpapers={setCustomWallpapers}
-            setWallpaper={setWallpaper}
-            setPrimaryColor={setPrimaryColor}
-          />
-        ) : (
-          <>
-            <Header
-              currentTime={currentTime}
-              currentDate={currentDate}
-              onSettingsClick={() => setShowSettings(true)}
-            />
+      {/* Показываем основной контент только после загрузки данных */}
+      {!isLoading && (
+        <>
+          <WallpaperOverlay wallpaper={wallpaper} darkMode={darkMode} />
 
-            <div className="mb-6">
-              <div className="flex items-center rounded-lg shadow-lg search-container">
-                <SearchInput
-                  onSearch={handleSearch}
-                  searchHistory={searchHistory}
-                  onAddToHistory={handleAddToHistory}
-                  onRemoveFromHistory={handleRemoveFromHistory}
-                  placeholder={`Поиск в ${currentSearchEngine.name}`}
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col min-h-[100%]">
-              <MainContent
-                activeTab={activeTab}
-                setActiveTab={setActiveTab}
+          <div
+            className="max-w-6xl mx-auto p-5"
+            style={{
+              minHeight: "100vh",
+            }}
+          >
+            {showWallpaperTab ? (
+              <WallpaperTab
+                onClose={() => setShowWallpaperTab(false)}
+                wallpaper={wallpaper}
+                setWallpaper={setWallpaper}
+                wallpapers={wallpapers}
+                customWallpapers={customWallpapers}
+                addWallpaper={addWallpaper}
+                updateWallpaper={updateWallpaper}
+                removeWallpaper={removeWallpaper}
+                removeCustomWallpaper={removeCustomWallpaper}
+                setFullscreenWallpaper={setFullscreenWallpaper}
+                setShowUrlModal={setShowUrlModal}
+                wallpaperUrl={wallpaperUrl}
+                setWallpaperUrl={setWallpaperUrl}
+              />
+            ) : showSettings ? (
+              <Settings
+                onClose={() => setShowSettings(false)}
+                darkMode={darkMode}
+                setDarkMode={setDarkMode}
+                primaryColor={primaryColor}
+                setPrimaryColor={setPrimaryColor}
+                wallpaper={wallpaper}
+                setWallpaper={setWallpaper}
                 siteGroups={siteGroups}
                 setSiteGroups={setSiteGroups}
-                tabLayout={tabLayout}
                 customIcons={customIcons}
-                openAddSiteForm={openAddSiteForm}
+                setCustomIcons={setCustomIcons}
+                tabLayout={tabLayout}
+                setTabLayout={setTabLayout}
+                setShowWallpaperTab={setShowWallpaperTab}
+                panelBlur={panelBlur}
+                setPanelBlur={setPanelBlur}
+                searchEngines={searchEngines}
+                setSearchEngines={setSearchEngines}
+                currentSearchEngine={currentSearchEngine}
+                setCurrentSearchEngine={setCurrentSearchEngine}
+                colorPresets={colorPresets}
+                setColorPresets={setColorPresets}
+                updatePrimaryColor={updatePrimaryColor}
+                updateWallpaperOpacity={updateWallpaperOpacity}
+                generateId={generateId}
+                addSearchEngine={addSearchEngine}
+                removeSearchEngine={removeSearchEngine}
+                openAddGroupForm={openAddGroupForm}
+                openEditGroupForm={openEditGroupForm}
+                deleteGroup={deleteGroup}
+                setShowIconManager={setShowIconManager}
                 openEditSiteForm={openEditSiteForm}
                 deleteSite={deleteSite}
-                handleSiteClick={handleSiteClick}
-                draggingSite={draggingSite}
-                dragOverGroupId={dragOverGroupId}
-                dragOverSiteId={dragOverSiteId}
-                handleSiteDragStart={handleSiteDragStart}
-                handleSiteDragOver={handleSiteDragOver}
-                handleSiteDragEnd={handleSiteDragEnd}
-                handleSiteDrop={handleSiteDrop}
-                hiddenCategories={hiddenCategories}
-                toggleCategoryVisibility={toggleCategoryVisibility}
-                openAddGroupForm={openAddGroupForm}
+                openAddSiteForm={openAddSiteForm}
+                themePresets={themePresets}
+                setThemePresets={setThemePresets}
+                newPresetName={newPresetName}
+                setNewPresetName={setNewPresetName}
+                updatePresetName={updatePresetName}
+                editingPresetId={editingPresetId}
+                setEditingPresetId={setEditingPresetId}
+                applyThemePreset={applyThemePreset}
+                removeThemePreset={removeThemePreset}
+                wallpapers={wallpapers}
+                setWallpapers={setWallpapers}
+                customWallpapers={customWallpapers}
+                setCustomWallpapers={setCustomWallpapers}
+                setWallpaper={setWallpaper}
+                setPrimaryColor={setPrimaryColor}
               />
-
-              {tabLayout === "dock" && siteGroups.length > 0 && (
-                <ResponsiveDock
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  siteGroups={siteGroups}
-                  tabLayout={tabLayout}
+            ) : (
+              <>
+                <Header
+                  currentTime={currentTime}
+                  currentDate={currentDate}
+                  onSettingsClick={() => setShowSettings(true)}
                 />
-              )}
-            </div>
-          </>
-        )}
 
-        {fullscreenWallpaper && (
-          <FullscreenWallpaper
-            wallpaper={wallpaper}
-            fullscreenWallpaper={fullscreenWallpaper}
-            setFullscreenWallpaper={setFullscreenWallpaper}
-            updateWallpaper={updateWallpaper}
-            removeWallpaper={removeWallpaper}
-            removeCustomWallpaper={removeCustomWallpaper}
-            wallpapers={wallpapers}
-            customWallpapers={customWallpapers}
-          />
-        )}
-
-        {showGroupModal && (
-          <GroupModal
-            groupForm={groupForm}
-            setGroupForm={setGroupForm}
-            editingGroup={editingGroup}
-            saveGroup={saveGroup}
-            setShowGroupModal={setShowGroupModal}
-            setShowIconManager={setShowIconManager}
-            customIcons={customIcons}
-            getIcon={getIcon}
-          />
-        )}
-
-        {showSiteModal && (
-          <SiteModal
-            siteForm={siteForm}
-            setSiteForm={setSiteForm}
-            editingSite={editingSite}
-            saveSite={saveSite}
-            setShowSiteModal={setShowSiteModal}
-            setShowIconManager={setShowIconManager}
-            customIcons={customIcons}
-            getIcon={getIcon}
-          />
-        )}
-
-        {showIconManager && (
-          <IconManager
-            newCustomIcon={newCustomIcon}
-            setNewCustomIcon={setNewCustomIcon}
-            addCustomIcon={addCustomIcon}
-            customIcons={customIcons}
-            removeCustomIcon={removeCustomIcon}
-            setShowIconManager={setShowIconManager}
-            getIcon={getIcon}
-          />
-        )}
-
-        {showUrlModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="settings-panel w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">
-                Добавить обои по URL
-              </h2>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block mb-1">URL изображения</label>
-                  <input
-                    type="text"
-                    value={wallpaperUrl}
-                    onChange={(e) => setWallpaperUrl(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-slate-100 dark:bg-dark-600 border border-transparent focus:border-primary-500 outline-none"
-                    placeholder="https://example.com/image.jpg"
-                  />
+                <div className="mb-6">
+                  <div className="flex items-center rounded-lg shadow-lg search-container">
+                    <SearchInput
+                      onSearch={handleSearch}
+                      searchHistory={searchHistory}
+                      onAddToHistory={handleAddToHistory}
+                      onRemoveFromHistory={handleRemoveFromHistory}
+                      placeholder={`Поиск в ${currentSearchEngine.name}`}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4">
-                  <button
-                    className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-dark-700 hover:bg-slate-300 dark:hover:bg-dark-700"
-                    onClick={() => {
-                      setShowUrlModal(false);
-                      setWallpaperUrl("");
-                    }}
-                  >
-                    Отмена
-                  </button>
-                  <button
-                    className="px-4 py-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600"
-                    onClick={() => {
-                      if (wallpaperUrl.trim() !== "") {
-                        addWallpaper(wallpaperUrl.trim());
-                        setShowUrlModal(false);
-                        setWallpaperUrl("");
-                      }
-                    }}
-                    disabled={!wallpaperUrl.trim()}
-                  >
-                    Добавить
-                  </button>
+                <div className="flex flex-col min-h-[100%]">
+                  <MainContent
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    siteGroups={siteGroups}
+                    setSiteGroups={setSiteGroups}
+                    tabLayout={tabLayout}
+                    customIcons={customIcons}
+                    openAddSiteForm={openAddSiteForm}
+                    openEditSiteForm={openEditSiteForm}
+                    deleteSite={deleteSite}
+                    handleSiteClick={handleSiteClick}
+                    draggingSite={draggingSite}
+                    dragOverGroupId={dragOverGroupId}
+                    dragOverSiteId={dragOverSiteId}
+                    handleSiteDragStart={handleSiteDragStart}
+                    handleSiteDragOver={handleSiteDragOver}
+                    handleSiteDragEnd={handleSiteDragEnd}
+                    handleSiteDrop={handleSiteDrop}
+                    hiddenCategories={hiddenCategories}
+                    toggleCategoryVisibility={toggleCategoryVisibility}
+                    openAddGroupForm={openAddGroupForm}
+                  />
+
+                  {tabLayout === "dock" && siteGroups.length > 0 && (
+                    <ResponsiveDock
+                      activeTab={activeTab}
+                      setActiveTab={setActiveTab}
+                      siteGroups={siteGroups}
+                      tabLayout={tabLayout}
+                    />
+                  )}
+                </div>
+              </>
+            )}
+
+            {fullscreenWallpaper && (
+              <FullscreenWallpaper
+                wallpaper={wallpaper}
+                fullscreenWallpaper={fullscreenWallpaper}
+                setFullscreenWallpaper={setFullscreenWallpaper}
+                updateWallpaper={updateWallpaper}
+                removeWallpaper={removeWallpaper}
+                removeCustomWallpaper={removeCustomWallpaper}
+                wallpapers={wallpapers}
+                customWallpapers={customWallpapers}
+              />
+            )}
+
+            {showGroupModal && (
+              <GroupModal
+                groupForm={groupForm}
+                setGroupForm={setGroupForm}
+                editingGroup={editingGroup}
+                saveGroup={saveGroup}
+                setShowGroupModal={setShowGroupModal}
+                setShowIconManager={setShowIconManager}
+                customIcons={customIcons}
+                getIcon={getIcon}
+              />
+            )}
+
+            {showSiteModal && (
+              <SiteModal
+                siteForm={siteForm}
+                setSiteForm={setSiteForm}
+                editingSite={editingSite}
+                saveSite={saveSite}
+                setShowSiteModal={setShowSiteModal}
+                setShowIconManager={setShowIconManager}
+                customIcons={customIcons}
+                getIcon={getIcon}
+              />
+            )}
+
+            {showIconManager && (
+              <IconManager
+                newCustomIcon={newCustomIcon}
+                setNewCustomIcon={setNewCustomIcon}
+                addCustomIcon={addCustomIcon}
+                customIcons={customIcons}
+                removeCustomIcon={removeCustomIcon}
+                setShowIconManager={setShowIconManager}
+                getIcon={getIcon}
+              />
+            )}
+
+            {showUrlModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                <div className="settings-panel w-full max-w-md">
+                  <h2 className="text-xl font-semibold mb-4">
+                    Добавить обои по URL
+                  </h2>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block mb-1">URL изображения</label>
+                      <input
+                        type="text"
+                        value={wallpaperUrl}
+                        onChange={(e) => setWallpaperUrl(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-slate-100 dark:bg-dark-600 border border-transparent focus:border-primary-500 outline-none"
+                        placeholder="https://example.com/image.jpg"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4">
+                      <button
+                        className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-dark-700 hover:bg-slate-300 dark:hover:bg-dark-700"
+                        onClick={() => {
+                          setShowUrlModal(false);
+                          setWallpaperUrl("");
+                        }}
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        className="px-4 py-2 rounded-xl bg-primary-500 text-white hover:bg-primary-600"
+                        onClick={() => {
+                          if (wallpaperUrl.trim() !== "") {
+                            addWallpaper(wallpaperUrl.trim());
+                            setShowUrlModal(false);
+                            setWallpaperUrl("");
+                          }
+                        }}
+                        disabled={!wallpaperUrl.trim()}
+                      >
+                        Добавить
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </>
   );
 }
