@@ -12,7 +12,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru" suppressHydrationWarning>
       <head>
-        <script
+        {/* <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
               })()
             `,
           }}
-        />
+        />*/}
         {/* Font Awesome CSS */}
         <link
           rel="stylesheet"

@@ -13,6 +13,8 @@ import GroupModal from "./components/GroupModal";
 import SiteModal from "./components/SiteModal";
 import FullscreenWallpaper from "./components/FullscreenWallpaper";
 import Loader from "./components/Loader";
+import AlertModal from "./components/AlertModal";
+import ConfirmModal from "./components/ConfirmModal";
 import {
   compressImage,
   checkStorageLimit,
@@ -50,6 +52,13 @@ export default function Home() {
   const [showSiteModal, setShowSiteModal] = useState(false);
   const [showIconManager, setShowIconManager] = useState(false);
   const [showUrlModal, setShowUrlModal] = useState(false);
+
+  // Кастомные модальные окна
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmCallback, setConfirmCallback] = useState(null);
 
   // Редактирование
   const [editingGroup, setEditingGroup] = useState(null);
@@ -115,9 +124,6 @@ export default function Home() {
 
   // Инициализация
   useEffect(() => {
-    // Устанавливаем начальное состояние загрузки
-    setIsLoading(true);
-
     // Оборачиваем initializeLocalStorage в Promise для корректного завершения
     const loadFromLocalStorage = () => {
       return new Promise((resolve) => {
@@ -391,10 +397,12 @@ export default function Home() {
   };
 
   const deleteGroup = (groupId) => {
-    if (window.confirm("Вы уверены, что хотите удалить эту группу?")) {
+    setConfirmMessage("Вы уверены, что хотите удалить эту группу?");
+    setConfirmCallback(() => () => {
       setSiteGroups(siteGroups.filter((g) => g.id !== groupId));
       if (activeTab === groupId) setActiveTab("all");
-    }
+    });
+    setShowConfirm(true);
   };
 
   const openAddSiteForm = (groupId) => {
@@ -447,7 +455,8 @@ export default function Home() {
   };
 
   const deleteSite = (siteId, groupId) => {
-    if (confirm("Вы уверены, что хотите удалить этот сайт?")) {
+    setConfirmMessage("Вы уверены, что хотите удалить этот сайт?");
+    setConfirmCallback(() => () => {
       setSiteGroups(
         siteGroups.map((g) =>
           g.id === groupId
@@ -455,7 +464,8 @@ export default function Home() {
             : g,
         ),
       );
-    }
+    });
+    setShowConfirm(true);
   };
 
   const handleSiteClick = (url) => {
@@ -477,7 +487,8 @@ export default function Home() {
       setCustomIcons([...customIcons, newCustomIcon.trim()]);
       setNewCustomIcon("");
     } else {
-      alert("Эта иконка уже существует");
+      setAlertMessage("Эта иконка уже существует");
+      setShowAlert(true);
     }
   };
 
@@ -656,12 +667,14 @@ export default function Home() {
   // Функции для поисковых систем
   const addSearchEngine = () => {
     if (!newSearchEngineName.trim() || !newSearchEngineUrl.trim()) {
-      alert("Пожалуйста, заполните все поля");
+      setAlertMessage("Пожалуйста, заполните все поля");
+      setShowAlert(true);
       return;
     }
 
     if (!newSearchEngineUrl.includes("%s")) {
-      alert("URL должен содержать %s для подстановки запроса");
+      setAlertMessage("URL должен содержать %s для подстановки запроса");
+      setShowAlert(true);
       return;
     }
 
@@ -677,7 +690,8 @@ export default function Home() {
 
   const removeSearchEngine = (index) => {
     if (searchEngines.length <= 1) {
-      alert("Должна остаться хотя бы одна поисковая система");
+      setAlertMessage("Должна остаться хотя бы одна поисковая система");
+      setShowAlert(true);
       return;
     }
 
@@ -960,6 +974,29 @@ export default function Home() {
           </div>
         </>
       )}
+
+      {/* Кастомные модальные окна */}
+      <AlertModal
+        isOpen={showAlert}
+        message={alertMessage}
+        onClose={() => setShowAlert(false)}
+      />
+
+      <ConfirmModal
+        isOpen={showConfirm}
+        message={confirmMessage}
+        onConfirm={() => {
+          if (confirmCallback) {
+            confirmCallback();
+          }
+          setShowConfirm(false);
+          setConfirmCallback(null);
+        }}
+        onCancel={() => {
+          setShowConfirm(false);
+          setConfirmCallback(null);
+        }}
+      />
     </>
   );
 }
