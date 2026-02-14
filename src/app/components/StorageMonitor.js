@@ -10,6 +10,7 @@ export default function StorageMonitor({
   setWallpapers,
   wallpapers,
   refreshTrigger,
+  showConfirmModal,
 }) {
   const [usage, setUsage] = useState({ used: 0, total: 0, percent: 0 });
 
@@ -85,9 +86,18 @@ export default function StorageMonitor({
         <button
           className="flex-1 bg-red-500/10 text-red-600 dark:text-red-400 p-2 rounded-lg hover:bg-red-500/20"
           onClick={() => {
-            if (confirm("Удалить все пользовательские обои?")) {
-              setCustomWallpapers([]);
-              setWallpapers([]);
+            // Используем переданную функцию showConfirmModal
+            if (showConfirmModal) {
+              showConfirmModal("Удалить все пользовательские обои?", () => {
+                setCustomWallpapers([]);
+                setWallpapers([]);
+              });
+            } else {
+              // Резервный вариант - использовать стандартный confirm
+              if (confirm("Удалить все пользовательские обои?")) {
+                setCustomWallpapers([]);
+                setWallpapers([]);
+              }
             }
           }}
         >

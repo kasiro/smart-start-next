@@ -52,6 +52,8 @@ export default function Settings({
   setWallpapers,
   customWallpapers,
   setCustomWallpapers,
+  showConfirmModal,
+  showAlertModal,
 }) {
   const [importExportStatus, setImportExportStatus] = useState(null);
   const [newSearchEngineName, setNewSearchEngineName] = useState("");
@@ -125,12 +127,20 @@ export default function Settings({
 
   const handleAddSearchEngine = () => {
     if (!newSearchEngineName.trim() || !newSearchEngineUrl.trim()) {
-      alert("Пожалуйста, заполните все поля");
+      if (showAlertModal) {
+        showAlertModal("Пожалуйста, заполните все поля");
+      } else {
+        alert("Пожалуйста, заполните все поля");
+      }
       return;
     }
 
     if (!newSearchEngineUrl.includes("%s")) {
-      alert("URL должен содержать %s для подстановки запроса");
+      if (showAlertModal) {
+        showAlertModal("URL должен содержать %s для подстановки запроса");
+      } else {
+        alert("URL должен содержать %s для подстановки запроса");
+      }
       return;
     }
 
@@ -279,6 +289,13 @@ export default function Settings({
         wallpapers={wallpapers}
         setWallpapers={setWallpapers}
         refreshTrigger={refreshStorageMonitor}
+        showConfirmModal={(message, callback) => {
+          // Вызываем переданные функции для отображения модального окна подтверждения
+          window.setConfirmMessage && window.setConfirmMessage(message);
+          window.setConfirmCallback &&
+            window.setConfirmCallback(() => callback);
+          window.setShowConfirm && window.setShowConfirm(true);
+        }}
       />
 
       <div className="settings-panel">

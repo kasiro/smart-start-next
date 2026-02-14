@@ -8,6 +8,7 @@ export default function SearchInput({
   onAddToHistory,
   onRemoveFromHistory,
   placeholder = "Поиск в Google",
+  showConfirmModal,
 }) {
   const [inputValue, setInputValue] = useState("");
   const [showHistory, setShowHistory] = useState(false);
@@ -130,8 +131,24 @@ export default function SearchInput({
               className="px-4 py-1 cursor-pointer flex items-center justify-end"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => {
-                if (window.confirm("Очистить всю историю поиска?")) {
-                  onRemoveFromHistory("all");
+                if (showConfirmModal) {
+                  showConfirmModal("Очистить всю историю поиска?", () => {
+                    onRemoveFromHistory("all");
+                  });
+                } else if (
+                  window.setConfirmMessage &&
+                  window.setConfirmCallback &&
+                  window.setShowConfirm
+                ) {
+                  window.setConfirmMessage("Очистить всю историю поиска?");
+                  window.setConfirmCallback(() => () => {
+                    onRemoveFromHistory("all");
+                  });
+                  window.setShowConfirm(true);
+                } else {
+                  if (confirm("Очистить всю историю поиска?")) {
+                    onRemoveFromHistory("all");
+                  }
                 }
               }}
             >

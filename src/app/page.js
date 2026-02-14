@@ -732,6 +732,30 @@ export default function Home() {
     }
   };
 
+  // Установка функций в window для использования в дочерних компонентах
+  useEffect(() => {
+    window.setConfirmMessage = setConfirmMessage;
+    window.setConfirmCallback = setConfirmCallback;
+    window.setShowConfirm = setShowConfirm;
+    window.setAlertMessage = setAlertMessage;
+    window.setShowAlert = setShowAlert;
+
+    // Очистка при размонтировании
+    return () => {
+      window.setConfirmMessage = null;
+      window.setConfirmCallback = null;
+      window.setShowConfirm = null;
+      window.setAlertMessage = null;
+      window.setShowAlert = null;
+    };
+  }, [
+    setConfirmMessage,
+    setConfirmCallback,
+    setShowConfirm,
+    setAlertMessage,
+    setShowAlert,
+  ]);
+
   // Основной рендер
   return (
     <>
@@ -816,6 +840,15 @@ export default function Home() {
                 setCustomWallpapers={setCustomWallpapers}
                 setWallpaper={setWallpaper}
                 setPrimaryColor={setPrimaryColor}
+                showConfirmModal={(message, callback) => {
+                  setConfirmMessage(message);
+                  setConfirmCallback(() => callback);
+                  setShowConfirm(true);
+                }}
+                showAlertModal={(message) => {
+                  setAlertMessage(message);
+                  setShowAlert(true);
+                }}
               />
             ) : (
               <>
@@ -823,6 +856,28 @@ export default function Home() {
                   currentTime={currentTime}
                   currentDate={currentDate}
                   onSettingsClick={() => setShowSettings(true)}
+                />
+
+                <AlertModal
+                  isOpen={showAlert}
+                  message={alertMessage}
+                  onClose={() => setShowAlert(false)}
+                />
+
+                <ConfirmModal
+                  isOpen={showConfirm}
+                  message={confirmMessage}
+                  onConfirm={() => {
+                    if (confirmCallback) {
+                      confirmCallback();
+                      setConfirmCallback(null);
+                    }
+                    setShowConfirm(false);
+                  }}
+                  onCancel={() => {
+                    setConfirmCallback(null);
+                    setShowConfirm(false);
+                  }}
                 />
 
                 <div className="mb-6">
@@ -833,6 +888,11 @@ export default function Home() {
                       onAddToHistory={handleAddToHistory}
                       onRemoveFromHistory={handleRemoveFromHistory}
                       placeholder={`Поиск в ${currentSearchEngine.name}`}
+                      showConfirmModal={(message, callback) => {
+                        setConfirmMessage(message);
+                        setConfirmCallback(() => callback);
+                        setShowConfirm(true);
+                      }}
                     />
                   </div>
                 </div>
