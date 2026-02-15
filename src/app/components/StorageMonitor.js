@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useClickOutside } from "../../lib/hooks";
 
 export default function StorageMonitor({
   customWallpapers,
@@ -13,6 +14,7 @@ export default function StorageMonitor({
   showConfirmModal,
 }) {
   const [usage, setUsage] = useState({ used: 0, total: 0, percent: 0 });
+  const modalRef = useClickOutside(() => {});
 
   useEffect(() => {
     const calculateUsage = () => {

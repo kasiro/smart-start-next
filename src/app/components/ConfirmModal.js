@@ -2,9 +2,15 @@ import React from "react";
 import { useClickOutside } from "../../lib/hooks";
 
 const ConfirmModal = ({ isOpen, message, onConfirm, onCancel, onClose }) => {
-  if (!isOpen) return null;
+  const modalRef = useClickOutside(
+    isOpen
+      ? () => {
+          onCancel();
+        }
+      : null,
+  );
 
-  const modalRef = useClickOutside(onClose);
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

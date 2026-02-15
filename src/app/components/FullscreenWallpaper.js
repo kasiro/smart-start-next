@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useClickOutside } from "@/lib/hooks";
 
 export default function FullscreenWallpaper({
   wallpaper,
@@ -50,6 +51,10 @@ export default function FullscreenWallpaper({
     });
   };
 
+  const overlayRef = useClickOutside(() => {
+    setFullscreenWallpaper(null);
+  });
+
   if (!fullscreenWallpaper) return null;
 
   const isCurrent =
@@ -58,6 +63,7 @@ export default function FullscreenWallpaper({
 
   return (
     <div
+      ref={overlayRef}
       className="fullscreen-wallpaper-overlay"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
