@@ -1,4 +1,5 @@
 "use client";
+import { useClickOutside } from "../../lib/hooks";
 
 export default function GroupModal({
   groupForm,
@@ -10,9 +11,14 @@ export default function GroupModal({
   customIcons,
   getIcon,
 }) {
+  const modalRef = useClickOutside(() => setShowGroupModal(false));
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-overlay">
-      <div className="settings-panel w-full max-w-lg lg:max-w-2xl">
+      <div
+        ref={modalRef}
+        className="settings-panel w-full max-w-lg lg:max-w-2xl"
+      >
         <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
           {editingGroup ? "Редактировать группу" : "Добавить группу"}
         </h2>
@@ -48,7 +54,7 @@ export default function GroupModal({
                 Управление иконками
               </button>
             </div>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-60 overflow-y-auto p-3 bg-slate-50 dark:bg-dark-800 rounded-xl">
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-3 max-h-60 overflow-y-auto p-3 bg-slate-50 dark:bg-dark-800 rounded-xl">
               {customIcons.map((icon) => (
                 <button
                   key={icon}

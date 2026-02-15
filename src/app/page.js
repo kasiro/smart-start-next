@@ -15,6 +15,7 @@ import FullscreenWallpaper from "./components/FullscreenWallpaper";
 import Loader from "./components/Loader";
 import AlertModal from "./components/AlertModal";
 import ConfirmModal from "./components/ConfirmModal";
+import { useClickOutside } from "../lib/hooks";
 import {
   compressImage,
   checkStorageLimit,
@@ -756,6 +757,14 @@ export default function Home() {
     setShowAlert,
   ]);
 
+  // Обработчик для закрытия модального окна URL при клике вне его
+  const urlModalRef = useClickOutside(() => {
+    if (showUrlModal) {
+      setShowUrlModal(false);
+      setWallpaperUrl("");
+    }
+  });
+
   // Основной рендер
   return (
     <>
@@ -986,7 +995,11 @@ export default function Home() {
 
             {showUrlModal && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="settings-panel w-full max-w-md">
+                <div
+                  ref={urlModalRef}
+                  className="settings-panel w-full max-w-md"
+                  onClick={(e) => e.stopPropagation()} // Prevent click inside modal from closing it
+                >
                   <h2 className="text-xl font-semibold mb-4">
                     Добавить обои по URL
                   </h2>

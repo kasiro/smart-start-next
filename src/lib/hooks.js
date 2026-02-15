@@ -1,25 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef } from "react";
 
-export const useLocalStorage = (key, initialValue) => {
-  const [value, setValue] = useState(() => {
-    if (typeof window === 'undefined') return initialValue
-    try {
-      const item = window.localStorage.getItem(key)
-      return item ? JSON.parse(item) : initialValue
-    } catch (error) {
-      console.error(`Ошибка чтения localStorage ключа "${key}":`, error)
-      return initialValue
-    }
-  })
+// Хук для обнаружения кликов вне компонента
+export const useClickOutside = (callback) => {
+  const ref = useRef();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      window.localStorage.setItem(key, JSON.stringify(value))
-    } catch (error) {
-      console.error(`Ошибка записи localStorage ключа "${key}":`, error)
-    }
-  }, [key, value])
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback();
+      }
+    };
 
-  return [value, setValue]
-}
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [callback]);
+
+  return ref;
+};

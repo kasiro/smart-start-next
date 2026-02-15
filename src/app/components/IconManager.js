@@ -1,5 +1,5 @@
 "use client";
-
+import { useClickOutside } from "../../lib/hooks";
 import { DEFAULT_ICONS } from "../../lib/constants";
 
 export default function IconManager({
@@ -11,9 +11,14 @@ export default function IconManager({
   setShowIconManager,
   getIcon,
 }) {
+  const modalRef = useClickOutside(() => setShowIconManager(false));
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 modal-overlay">
-      <div className="settings-panel w-full max-w-4xl lg:max-w-6xl icon-manager-container">
+      <div
+        ref={modalRef}
+        className="settings-panel w-full max-w-4xl lg:max-w-6xl icon-manager-container"
+      >
         <div className="icon-manager-header">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-black dark:text-white">
@@ -60,7 +65,7 @@ export default function IconManager({
               Все иконки
             </h3>
             <div className="icon-manager-scroll-container dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-dark-800 p-4">
-              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-4">
+              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-4">
                 {[...DEFAULT_ICONS, ...customIcons].map((icon) => (
                   <div
                     key={icon}

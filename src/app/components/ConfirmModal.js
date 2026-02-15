@@ -1,11 +1,17 @@
 import React from "react";
+import { useClickOutside } from "../../lib/hooks";
 
 const ConfirmModal = ({ isOpen, message, onConfirm, onCancel, onClose }) => {
   if (!isOpen) return null;
 
+  const modalRef = useClickOutside(onClose);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-dark-700 rounded-xl p-6 max-w-md w-full shadow-xl">
+      <div
+        ref={modalRef}
+        className="bg-white dark:bg-dark-700 rounded-xl p-6 max-w-md w-full shadow-xl"
+      >
         <div className="text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 mb-4">
             <svg
