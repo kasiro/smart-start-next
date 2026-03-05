@@ -1,7 +1,7 @@
 ---
 id: ticket-002
 title: "Добавить drag-n-drop для групп в настройках для мобильных устройств"
-status: Todo
+status: Done
 priority: High
 order: 20
 created: 2026-03-05

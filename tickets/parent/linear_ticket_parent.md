@@ -1,7 +1,7 @@
 ---
 id: parent
 title: "[Epic] Drag-n-Drop Адаптация для Мобильных Устройств"
-status: Todo
+status: Done
 priority: High
 order: 0
 created: 2026-03-05

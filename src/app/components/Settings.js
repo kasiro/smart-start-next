@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StorageMonitor from "./StorageMonitor";
 import ThemePresets from "./ThemePresets";
 
@@ -59,6 +59,13 @@ export default function Settings({
   const [newSearchEngineName, setNewSearchEngineName] = useState("");
   const [newSearchEngineUrl, setNewSearchEngineUrl] = useState("");
   const [refreshStorageMonitor, setRefreshStorageMonitor] = useState(0);
+
+  // Мобильное устройство
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Drag-n-drop для групп (только для мобильных)
+  const [draggingGroupId, setDraggingGroupId] = useState(null);
+  const [dragOverGroupId, setDragOverGroupId] = useState(null);
 
   const cleanupOldData = () => {
     // Очистка старых данных из localStorage
@@ -239,6 +246,53 @@ export default function Settings({
     };
     reader.readAsText(file);
     event.target.value = "";
+  };
+
+  // Определение мобильного устройства
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Функции drag-n-drop для групп (только для мобильных)
+  const handleGroupDragStart = (e, groupId) => {
+    if (!isMobile) return; // Разрешаем только на мобильных
+    setDraggingGroupId(groupId);
+    e.dataTransfer.setData("text/plain", groupId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleGroupDragOver = (e, groupId) => {
+    if (!isMobile) return;
+    e.preventDefault();
+    if (draggingGroupId !== groupId) {
+      setDragOverGroupId(groupId);
+    }
+  };
+
+  const handleGroupDragEnd = () => {
+    setDraggingGroupId(null);
+    setDragOverGroupId(null);
+  };
+
+  const handleGroupDrop = (e, targetGroupId) => {
+    if (!isMobile) return;
+    e.preventDefault();
+    if (draggingGroupId && draggingGroupId !== targetGroupId) {
+      const groups = [...siteGroups];
+      const dragIndex = groups.findIndex((g) => g.id === draggingGroupId);
+      const dropIndex = groups.findIndex((g) => g.id === targetGroupId);
+
+      const [movedGroup] = groups.splice(dragIndex, 1);
+      groups.splice(dropIndex, 0, movedGroup);
+
+      setSiteGroups(groups);
+    }
+    setDragOverGroupId(null);
   };
 
   return (
@@ -734,7 +788,18 @@ export default function Settings({
           {siteGroups.map((group) => (
             <div
               key={group.id}
-              className="p-4 rounded-xl bg-slate-100 dark:bg-dark-800 relative"
+              className={`p-4 rounded-xl bg-slate-100 dark:bg-dark-800 relative transition-opacity ${
+                isMobile ? "cursor-grab" : ""
+              } ${
+                draggingGroupId === group.id ? "opacity-50" : ""
+              } ${
+                dragOverGroupId === group.id && isMobile ? "border-2 border-primary-500" : ""
+              }`}
+              draggable={isMobile}
+              onDragStart={(e) => handleGroupDragStart(e, group.id)}
+              onDragOver={(e) => handleGroupDragOver(e, group.id)}
+              onDragEnd={handleGroupDragEnd}
+              onDrop={(e) => handleGroupDrop(e, group.id)}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3 text-primary-500">
