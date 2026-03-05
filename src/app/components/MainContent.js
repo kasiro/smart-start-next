@@ -121,20 +121,20 @@ export default function MainContent({
               <div className="mb-3 ml-2">
                 <div
                   className={`inline-flex items-center p-3 rounded-xl bg_blur_5 text-primary-500 cursor-pointer transition-opacity ${
-                    !isMobile ? "cursor-grab" : ""
+                    !isMobile && activeTab === 'all' ? "cursor-grab" : ""
                   } ${
                     draggingGroupId === group.id ? "opacity-50" : ""
                   } ${
-                    dragOverGroupId === group.id && !isMobile ? "border-2 border-primary-500" : ""
+                    dragOverGroupId === group.id && !isMobile && activeTab === 'all' ? "border-2 border-primary-500" : ""
                   }`}
                   onClick={() =>
                     activeTab === "all" && toggleCategoryVisibility(group.id)
                   }
-                  draggable={!isMobile}
-                  onDragStart={(e) => !isMobile && handleDragStart(e, group.id)}
-                  onDragOver={(e) => !isMobile && handleDragOver(e, group.id)}
-                  onDragEnd={!isMobile ? handleDragEnd : undefined}
-                  onDrop={(e) => !isMobile && handleDrop(e, group.id)}
+                  draggable={!isMobile && activeTab === 'all'}
+                  onDragStart={(e) => !isMobile && activeTab === 'all' && handleDragStart(e, group.id)}
+                  onDragOver={(e) => !isMobile && activeTab === 'all' && handleDragOver(e, group.id)}
+                  onDragEnd={!isMobile && activeTab === 'all' ? handleDragEnd : undefined}
+                  onDrop={(e) => !isMobile && activeTab === 'all' && handleDrop(e, group.id)}
                 >
                   {getIcon(group.icon)}
                   <h2 className="text-black dark:text-white text-xl pl-2 font-semibold">
