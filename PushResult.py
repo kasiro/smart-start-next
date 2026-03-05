@@ -5,6 +5,12 @@ from subprocess import run
 from sys import argv, exit
 from time import sleep
 
+"""
+to run:
+
+python PushResult.py -k -d -m 'message'
+"""
+
 argv.pop(0)
 
 

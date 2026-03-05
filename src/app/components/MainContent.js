@@ -24,6 +24,12 @@ export default function MainContent({
   hiddenCategories,
   toggleCategoryVisibility,
   openAddGroupForm,
+  isMobile,
+  handleDragStart,
+  handleDragOver,
+  handleDragEnd,
+  handleDrop,
+  draggingGroupId,
 }) {
   const filteredGroups = siteGroups.filter((group) => {
     if (activeTab === "all") return true;
@@ -114,10 +120,21 @@ export default function MainContent({
             >
               <div className="mb-3 ml-2">
                 <div
-                  className="inline-flex items-center p-3 rounded-xl bg_blur_5 text-primary-500 cursor-pointer"
+                  className={`inline-flex items-center p-3 rounded-xl bg_blur_5 text-primary-500 cursor-pointer transition-opacity ${
+                    !isMobile ? "cursor-grab" : ""
+                  } ${
+                    draggingGroupId === group.id ? "opacity-50" : ""
+                  } ${
+                    dragOverGroupId === group.id && !isMobile ? "border-2 border-primary-500" : ""
+                  }`}
                   onClick={() =>
                     activeTab === "all" && toggleCategoryVisibility(group.id)
                   }
+                  draggable={!isMobile}
+                  onDragStart={(e) => !isMobile && handleDragStart(e, group.id)}
+                  onDragOver={(e) => !isMobile && handleDragOver(e, group.id)}
+                  onDragEnd={!isMobile ? handleDragEnd : undefined}
+                  onDrop={(e) => !isMobile && handleDrop(e, group.id)}
                 >
                   {getIcon(group.icon)}
                   <h2 className="text-black dark:text-white text-xl pl-2 font-semibold">

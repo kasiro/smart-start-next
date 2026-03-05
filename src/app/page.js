@@ -108,6 +108,9 @@ export default function Home() {
   const [dragOverSiteId, setDragOverSiteId] = useState(null);
   const [draggingGroupId, setDraggingGroupId] = useState(null);
 
+  // Мобильное устройство
+  const [isMobile, setIsMobile] = useState(false);
+
   // Формы
   const [groupForm, setGroupForm] = useState({
     name: "",
@@ -160,6 +163,16 @@ export default function Home() {
     loadFromLocalStorage().then(() => {
       setIsLoading(false);
     });
+  }, []);
+
+  // Определение мобильного устройства
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Обновление времени
@@ -633,6 +646,7 @@ export default function Home() {
   };
 
   const handleDragStart = (e, groupId) => {
+    if (isMobile) return; // Отключаем drag-n-drop групп на мобильных
     setDraggingGroupId(groupId);
     e.dataTransfer.setData("text/plain", groupId);
     e.dataTransfer.effectAllowed = "move";
@@ -928,6 +942,12 @@ export default function Home() {
                     hiddenCategories={hiddenCategories}
                     toggleCategoryVisibility={toggleCategoryVisibility}
                     openAddGroupForm={openAddGroupForm}
+                    isMobile={isMobile}
+                    handleDragStart={handleDragStart}
+                    handleDragOver={handleDragOver}
+                    handleDragEnd={handleDragEnd}
+                    handleDrop={handleDrop}
+                    draggingGroupId={draggingGroupId}
                   />
 
                   {tabLayout === "dock" && siteGroups.length > 0 && (
