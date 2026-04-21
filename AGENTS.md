@@ -16,7 +16,7 @@ npm start          # Run production build
 - **BasePath**: `/kasiro_start_page` - project is deployed to GitHub Pages
 - **CSS workflow**: Tailwind compiles to `src/app/globals.css` from `src/app/main.tailwindcss`. Always run CSS build before dev/production builds.
 - **State**: LocalStorage-based (no backend). Settings persist across sessions.
-- **No tests**: Project has no automated tests.
+- **Tests**: Jest + React Testing Library. Run `bun test` or `bun test:watch`
 
 ## Project Structure
 

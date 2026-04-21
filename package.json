@@ -8,7 +8,9 @@
     "start": "next start",
     "css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify",
     "dev:css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify && npm run dev",
-    "build:css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify && npm run build"
+    "build:css": "npx tailwindcss -i ./src/app/main.tailwindcss -o ./src/app/globals.css -c ./tailwind.config.js --minify && npm run build",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -21,10 +23,14 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "autoprefixer": "^10.4.24",
     "eslint": "9.39.2",
     "eslint-config-next": "16.1.6",
     "gh-pages": "^6.3.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19"
   }
