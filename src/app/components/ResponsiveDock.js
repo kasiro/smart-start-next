@@ -13,6 +13,7 @@ export default function ResponsiveDock({
   setDockItems,
   draggingItem,
   onContextMenu,
+  dockPopupGroup,
   setDockPopupGroup,
   onSiteClick,
   isMobile,
