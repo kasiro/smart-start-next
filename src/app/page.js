@@ -15,6 +15,8 @@ import FullscreenWallpaper from "./components/FullscreenWallpaper";
 import Loader from "./components/Loader";
 import AlertModal from "./components/AlertModal";
 import ConfirmModal from "./components/ConfirmModal";
+import ContextMenu, { ContextMenuItem } from "./components/ContextMenu";
+import DockPopup from "./components/DockPopup";
 import { useClickOutside } from "../lib/hooks";
 import {
   compressImage,
@@ -86,6 +88,12 @@ export default function Home() {
   const [siteGroups, setSiteGroups] = useState([]);
   const [customIcons, setCustomIcons] = useState(DEFAULT_ICONS);
   const [hiddenCategories, setHiddenCategories] = useState([]);
+
+  // Dock - сайты на панели (desktop)
+  const [dockSites, setDockSites] = useState([]);
+
+  // Popup для папки в доке
+  const [dockPopupGroup, setDockPopupGroup] = useState(null);
 
   // Поисковые системы
   const [searchEngines, setSearchEngines] = useState(SEARCH_ENGINES);
@@ -237,6 +245,7 @@ export default function Home() {
     localStorage.setItem("wallpapers", JSON.stringify(wallpapers));
     localStorage.setItem("customWallpapers", JSON.stringify(customWallpapers));
     localStorage.setItem("hiddenCategories", JSON.stringify(hiddenCategories));
+    localStorage.setItem("dockSites", JSON.stringify(dockSites));
     localStorage.setItem("themePresets", JSON.stringify(themePresets));
     localStorage.setItem("colorPresets", JSON.stringify(colorPresets));
     localStorage.setItem("wallpaper", JSON.stringify(wallpaper));
@@ -253,6 +262,7 @@ export default function Home() {
     themePresets,
     colorPresets,
     wallpaper,
+    dockSites,
   ]);
 
   // Функции для работы с цветом
@@ -484,6 +494,26 @@ export default function Home() {
 
   const handleSiteClick = (url) => {
     window.open(url, "_blank");
+  };
+
+  // Context menu для dock
+  const [dockContextMenu, setDockContextMenu] = useState(null);
+
+  const handleDockContextMenu = (e, tab, isGroup) => {
+    e.preventDefault();
+    setDockContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      tab,
+      isGroup,
+    });
+  };
+
+  const removeFromDock = (tab) => {
+    if (tab.type === "site") {
+      setDockSites(dockSites.filter((s) => s.id !== tab.id));
+    }
+    setDockContextMenu(null);
   };
 
   // Функции для иконок
@@ -963,12 +993,14 @@ export default function Home() {
                     draggingGroupId={draggingGroupId}
                   />
 
-                  {tabLayout === "dock" && siteGroups.length > 0 && (
+                  {tabLayout === "dock" && ((!isMobile && siteGroups.length > 0) || isMobile) && (
                     <ResponsiveDock
                       activeTab={activeTab}
                       setActiveTab={setActiveTab}
                       siteGroups={siteGroups}
                       tabLayout={tabLayout}
+                      dockSites={dockSites}
+                      setDockSites={setDockSites}
                       draggingSite={draggingSite}
                       dragOverGroupId={dragOverGroupId}
                       dragOverSiteId={dragOverSiteId}
@@ -980,6 +1012,10 @@ export default function Home() {
                       handleGroupDragOver={handleGroupDragOver}
                       handleGroupDrop={handleGroupDrop}
                       handleDragEnd={handleDragEnd}
+                      isMobile={isMobile}
+                      onContextMenu={handleDockContextMenu}
+                      setDockPopupGroup={setDockPopupGroup}
+                      onSiteClick={handleSiteClick}
                     />
                   )}
                 </div>
@@ -997,6 +1033,39 @@ export default function Home() {
                 wallpapers={wallpapers}
                 customWallpapers={customWallpapers}
               />
+            )}
+
+            {dockPopupGroup && (
+              <DockPopup
+                group={dockPopupGroup}
+                siteGroups={siteGroups}
+                onClose={() => setDockPopupGroup(null)}
+                onSiteClick={handleSiteClick}
+              />
+            )}
+
+            {dockContextMenu && (
+              <ContextMenu
+                x={dockContextMenu.x}
+                y={dockContextMenu.y}
+                onClose={() => setDockContextMenu(null)}
+              >
+                {(dockContextMenu.tab.type === "site" || !dockContextMenu.isGroup) && (
+                  <ContextMenuItem onClick={() => removeFromDock(dockContextMenu.tab)}>
+                    <i className="fas fa-trash w-4"></i>
+                    Удалить из докбара
+                  </ContextMenuItem>
+                )}
+                {dockContextMenu.isGroup && (
+                  <ContextMenuItem onClick={() => {
+                    setActiveTab(dockContextMenu.tab.id);
+                    setDockContextMenu(null);
+                  }}>
+                    <i className="fas fa-folder w-4"></i>
+                    Открыть как вкладку
+                  </ContextMenuItem>
+                )}
+              </ContextMenu>
             )}
 
             {showGroupModal && (

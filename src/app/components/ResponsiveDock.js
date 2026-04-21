@@ -9,6 +9,8 @@ export default function ResponsiveDock({
   setActiveTab,
   siteGroups,
   tabLayout,
+  dockSites,
+  setDockSites,
   draggingSite,
   dragOverGroupId,
   dragOverSiteId,
@@ -20,8 +22,12 @@ export default function ResponsiveDock({
   handleGroupDragOver,
   handleGroupDrop,
   handleDragEnd,
+  onContextMenu,
+  setDockPopupGroup,
+  onSiteClick,
+  isMobile,
 }) {
-  const [deviceType, setDeviceType] = useState(null); // null на сервере
+  const [deviceType, setDeviceType] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -39,9 +45,15 @@ export default function ResponsiveDock({
     }
   }, []);
 
-  // Показываем соответствующий компонент в зависимости от типа устройства
   if (deviceType === 'mobile') {
-    return <MobileDock activeTab={activeTab} setActiveTab={setActiveTab} siteGroups={siteGroups} tabLayout={tabLayout} />;
+    return (
+      <MobileDock
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        siteGroups={siteGroups}
+        tabLayout={tabLayout}
+      />
+    );
   } else if (deviceType === 'desktop') {
     return (
       <DesktopDock
@@ -49,6 +61,8 @@ export default function ResponsiveDock({
         setActiveTab={setActiveTab}
         siteGroups={siteGroups}
         tabLayout={tabLayout}
+        dockSites={dockSites}
+        setDockSites={setDockSites}
         draggingSite={draggingSite}
         dragOverGroupId={dragOverGroupId}
         dragOverSiteId={dragOverSiteId}
@@ -60,10 +74,13 @@ export default function ResponsiveDock({
         handleGroupDragOver={handleGroupDragOver}
         handleGroupDrop={handleGroupDrop}
         handleDragEnd={handleDragEnd}
+        isMobile={isMobile}
+        onContextMenu={onContextMenu}
+        setDockPopupGroup={setDockPopupGroup}
+        onSiteClick={onSiteClick}
       />
     );
   } else {
-    // На сервере или до определения типа устройства не отображаем ничего
     return null;
   }
 }

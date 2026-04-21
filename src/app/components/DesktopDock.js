@@ -8,9 +8,10 @@ export default function DesktopDock({
   setActiveTab,
   siteGroups,
   tabLayout,
+  dockSites,
+  setDockSites,
   draggingSite,
   dragOverGroupId,
-  dragOverSiteId,
   handleSiteDragStart,
   handleSiteDragOver,
   handleSiteDrop,
@@ -19,29 +20,47 @@ export default function DesktopDock({
   handleGroupDragOver,
   handleGroupDrop,
   handleDragEnd,
+  isMobile,
+  onContextMenu,
+  setDockPopupGroup,
+  onSiteClick,
 }) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [tooltipTab, setTooltipTab] = useState(null);
   const tooltipTimeoutRef = useRef(null);
   const moreMenuRef = useRef(null);
 
-  const tabs = [
-    { id: "all", name: "Все", icon: "bookmark" },
-    ...siteGroups.map((group) => ({
-      id: group.id,
-      name: group.name,
-      icon: group.icon,
-    })),
-  ];
+  // Build tabs from dockSites (desktop only, show sites directly)
+  const allSitesTab = { id: "all", name: "Все", icon: "bookmark", type: "all" };
+  
+  const tabs = dockSites.length > 0 
+    ? [allSitesTab, ...dockSites.map(site => ({ ...site, type: "site" }))]
+    : [allSitesTab];
 
-  const maxVisibleTabs = 8; // Больше вкладок для десктопа
+  // Проверяем, есть ли хоть что-то в доке
+  const hasDockContent = tabs.length > 1;
+
+  // If no dock sites, show groups (for initial setup)
+  const displayTabs = hasDockContent 
+    ? tabs 
+    : [
+        { id: "all", name: "Все", icon: "bookmark" },
+        ...siteGroups.map((group) => ({
+          id: group.id,
+          name: group.name,
+          icon: group.icon,
+        })),
+      ];
+
+  const maxVisibleTabs = 8;
   const visibleTabs =
-    tabs.length <= maxVisibleTabs ? tabs : tabs.slice(0, maxVisibleTabs - 1);
+    displayTabs.length <= maxVisibleTabs
+      ? displayTabs
+      : displayTabs.slice(0, maxVisibleTabs - 1);
   const hiddenTabs =
-    tabs.length <= maxVisibleTabs ? [] : tabs.slice(maxVisibleTabs - 1);
+    displayTabs.length <= maxVisibleTabs ? [] : displayTabs.slice(maxVisibleTabs - 1);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -54,20 +73,16 @@ export default function DesktopDock({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Функция для отображения тултипа с задержкой
   const showTooltipWithDelay = (tabId) => {
-    // Очищаем предыдущий таймер
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
 
-    // Устанавливаем таймер для отображения тултипа через 2.5 секунды
     tooltipTimeoutRef.current = setTimeout(() => {
       setTooltipTab(tabId);
     }, 200);
   };
 
-  // Функция для скрытия тултипа
   const hideTooltip = () => {
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
@@ -75,10 +90,8 @@ export default function DesktopDock({
     setTooltipTab(null);
   };
 
-  const activeHiddenTab = hiddenTabs.find((tab) => tab.id === activeTab);
-
   const scrollTabIntoView = (tabId) => {
-    const tabElement = document.getElementById(`tab-${tabId}`);
+    const tabElement = document.getElementById(`dock-tab-${tabId}`);
     if (!tabElement) return;
 
     const container = tabElement.parentElement;
@@ -102,17 +115,36 @@ export default function DesktopDock({
     }
   };
 
+  const handleTabClick = (tab) => {
+    if (tab.type === "site") {
+      // Open site directly
+      onSiteClick(tab.url);
+    } else if (tab.type === "all" || !hasDockContent) {
+      // Switch to group
+      setActiveTab(tab.id);
+      scrollTabIntoView(tab.id);
+    } else {
+      // Open group popup
+      setDockPopupGroup(tab);
+    }
+  };
+
+  const handleRightClick = (e, tab) => {
+    e.preventDefault();
+    if (tab.type === "site" || !hasDockContent) {
+      onContextMenu(e, tab, false);
+    }
+  };
+
   return (
     <div
       className="desktop-dock-bar"
       onMouseEnter={() => {
         setIsHovered(true);
-        setIsExpanded(true);
       }}
       onMouseLeave={() => {
         setIsHovered(false);
-        setIsExpanded(false);
-        setHoveredTab(null); // Сбрасываем hoveredTab при уходе мыши
+        setHoveredTab(null);
       }}
       style={{
         position: "fixed",
@@ -127,7 +159,7 @@ export default function DesktopDock({
         {visibleTabs.map((tab) => (
           <button
             key={tab.id}
-            id={`tab-${tab.id}`}
+            id={`dock-tab-${tab.id}`}
             className={`desktop-dock-tab ${
               isHovered && (hoveredTab === tab.id || hoveredTab === null)
                 ? "scale-110 macos-dock-tab-default"
@@ -137,33 +169,16 @@ export default function DesktopDock({
                 ? "scale-125 macos-dock-tab-hovered"
                 : ""
             } ${
-              activeTab === tab.id
+              tab.type === "site" && tab.isActive
+                ? "desktop-dock-tab-active desktop-dock-tab-selected"
+                : tab.type === "all" || activeTab === tab.id
                 ? "desktop-dock-tab-active desktop-dock-tab-selected"
                 : "desktop-dock-tab-inactive"
             } ${
-              dragOverGroupId === tab.id && tab.id !== "all"
-                ? "border-2 border-primary-500"
-                : ""
-            } ${draggingSite ? "cursor-copy" : ""}`}
-            draggable={tab.id !== "all"}
-            onDragStart={(e) => tab.id !== "all" && handleGroupDragStart && handleGroupDragStart(e, tab.id)}
-            onDragOver={(e) => {
-              if (tab.id !== "all" && handleGroupDragOver) {
-                handleGroupDragOver(e, tab.id);
-              }
-            }}
-            onDrop={(e) => {
-              if (tab.id !== "all" && draggingSite && handleSiteDrop) {
-                handleSiteDrop(e, tab.id);
-              } else if (tab.id !== "all" && handleGroupDrop) {
-                handleGroupDrop(e, tab.id);
-              }
-            }}
-            onDragEnd={handleDragEnd}
-            onClick={() => {
-              setActiveTab(tab.id);
-              scrollTabIntoView(tab.id);
-            }}
+              dragOverGroupId === tab.id ? "border-2 border-primary-500" : ""
+            }`}
+            onClick={() => handleTabClick(tab)}
+            onContextMenu={(e) => handleRightClick(e, tab)}
             onMouseEnter={() => {
               setHoveredTab(tab.id);
               showTooltipWithDelay(tab.id);
@@ -172,11 +187,17 @@ export default function DesktopDock({
               hideTooltip();
             }}
           >
-            <div className="desktop-dock-tab-icon">{getIcon(tab.icon)}</div>
+            <div className="desktop-dock-tab-icon">
+              {tab.type === "site" ? (
+                <span className="text-lg">{getIcon(tab.icon)}</span>
+              ) : (
+                getIcon(tab.icon)
+              )}
+            </div>
             {tooltipTab === tab.id && (
               <div className="desktop-dock-tab-tooltip">
                 <span className="desktop-dock-tab-tooltip-text">
-                  {tab.name}
+                  {tab.type === "site" ? tab.name : tab.name}
                 </span>
               </div>
             )}
@@ -194,10 +215,6 @@ export default function DesktopDock({
                 isHovered && hoveredTab === "more"
                   ? "scale-125 macos-dock-tab-hovered"
                   : ""
-              } ${
-                hiddenTabs.some((tab) => tab.id === activeTab)
-                  ? "desktop-dock-tab-active desktop-dock-tab-selected"
-                  : "desktop-dock-tab-inactive"
               }`}
               onClick={() => setShowMoreMenu(!showMoreMenu)}
               onMouseEnter={() => {
@@ -209,37 +226,15 @@ export default function DesktopDock({
               }}
             >
               <div className="desktop-dock-tab-icon">
-                {hiddenTabs.some((tab) => tab.id === activeTab) ? (
-                  <>
-                    {getIcon(activeHiddenTab?.icon)}
-                    {activeTab === activeHiddenTab?.id && (
-                      <div className="desktop-dock-tab-title">
-                        <span className="desktop-dock-tab-title-text">
-                          {activeHiddenTab?.name}
-                        </span>
-                      </div>
-                    )}
-                    {tooltipTab === "more" && activeHiddenTab && (
-                      <div className="desktop-dock-tab-tooltip">
-                        <span className="desktop-dock-tab-tooltip-text">
-                          {activeHiddenTab?.name}
-                        </span>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-ellipsis-h"></i>
-                    {tooltipTab === "more" && (
-                      <div className="desktop-dock-tab-tooltip">
-                        <span className="desktop-dock-tab-tooltip-text">
-                          Дополнительные вкладки
-                        </span>
-                      </div>
-                    )}
-                  </>
-                )}
+                <i className="fas fa-ellipsis-h"></i>
               </div>
+              {tooltipTab === "more" && (
+                <div className="desktop-dock-tab-tooltip">
+                  <span className="desktop-dock-tab-tooltip-text">
+                    Дополнительные
+                  </span>
+                </div>
+              )}
             </button>
 
             {showMoreMenu && (
@@ -249,18 +244,15 @@ export default function DesktopDock({
                     key={tab.id}
                     className="desktop-dock-more-item"
                     onClick={() => {
-                      setActiveTab(tab.id);
-                      scrollTabIntoView(tab.id);
+                      handleTabClick(tab);
                       setShowMoreMenu(false);
                     }}
+                    onContextMenu={(e) => handleRightClick(e, tab)}
                   >
                     {getIcon(tab.icon)}
                     <span className="text-black dark:text-white">
                       {tab.name}
                     </span>
-                    {activeTab === tab.id && (
-                      <i className="fas fa-check ml-auto text-primary-500"></i>
-                    )}
                   </button>
                 ))}
               </div>

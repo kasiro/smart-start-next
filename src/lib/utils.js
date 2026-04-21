@@ -103,6 +103,9 @@ export const initializeLocalStorage = (setters) => {
     const currentSearchEngine = localStorage.getItem("currentSearchEngine");
     if (currentSearchEngine)
       setters.setCurrentSearchEngine(JSON.parse(currentSearchEngine));
+
+    const dockSites = localStorage.getItem("dockSites");
+    if (dockSites) setters.setDockSites(JSON.parse(dockSites));
   } catch (error) {
     console.error("Ошибка загрузки из localStorage:", error);
   }
