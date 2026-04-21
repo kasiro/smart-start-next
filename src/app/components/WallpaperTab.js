@@ -14,6 +14,9 @@ export default function WallpaperTab({
   setShowUrlModal,
   wallpaperUrl,
   setWallpaperUrl,
+  setConfirmMessage,
+  setConfirmCallback,
+  setShowConfirm,
 }) {
   return (
     <div className="fixed inset-0 z-40 overflow-y-auto my-5 rounded-lg">
@@ -89,8 +92,8 @@ export default function WallpaperTab({
                   wallpaper.type === wp.type &&
                   wallpaper.value === wp.value
                 ) {
-                  // Если обоина уже активна, просто закрываем галерею
-                  onClose();
+                  // Если обоина уже активна, открываем полноэкранный режим
+                  setFullscreenWallpaper(wp);
                 } else {
                   // Если обоина неактивна, устанавливаем её и закрываем галерею
                   setFullscreenWallpaper(wp);
@@ -124,6 +127,23 @@ export default function WallpaperTab({
                   <i className="fas fa-link text-white text-xs"></i>
                 )}
               </div>
+              <button
+                className="absolute top-1 left-1 bg-red-500 bg-opacity-70 hover:bg-opacity-90 rounded-md justify-center items-center px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setConfirmMessage("Удалить эти обои?");
+                  setConfirmCallback(() => () => {
+                    if (index < wallpapers.length) {
+                      removeWallpaper(index);
+                    } else {
+                      removeCustomWallpaper(index - wallpapers.length);
+                    }
+                  });
+                  setShowConfirm(true);
+                }}
+              >
+                <i className="fas fa-trash text-white text-xs"></i>
+              </button>
             </div>
           ))}
         </div>

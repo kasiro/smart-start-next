@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useClickOutside } from "@/lib/hooks";
 
 export default function FullscreenWallpaper({
@@ -69,6 +69,12 @@ export default function FullscreenWallpaper({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      <button
+        className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-black/50 text-white rounded-full hover:bg-black/70"
+        onClick={() => setFullscreenWallpaper(null)}
+      >
+        <i className="fas fa-times"></i>
+      </button>
       <div
         className="fullscreen-wallpaper-content"
         style={{

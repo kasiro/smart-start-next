@@ -840,6 +840,9 @@ export default function Home() {
                 setShowUrlModal={setShowUrlModal}
                 wallpaperUrl={wallpaperUrl}
                 setWallpaperUrl={setWallpaperUrl}
+                setConfirmMessage={setConfirmMessage}
+                setConfirmCallback={setConfirmCallback}
+                setShowConfirm={setShowConfirm}
               />
             ) : showSettings ? (
               <Settings
