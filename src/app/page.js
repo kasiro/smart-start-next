@@ -543,7 +543,7 @@ dockItems,
 
   const addToDock = (item) => {
     if (!dockItems.find(i => i.id === item.id)) {
-      setDockItems([...dockItems, item]);
+      setDockItems([...dockItems, { ...item, type: "site" }]);
     }
   };
 
@@ -960,6 +960,7 @@ showAlertModal={(message) => {
                 }}
                 dockItems={dockItems}
                 setDockItems={setDockItems}
+                siteGroups={siteGroups}
               />
             ) : (
               <>

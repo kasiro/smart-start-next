@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { getIcon } from "../../lib/utils";
 
-export default function DockPopup({ group, siteGroups, onClose, onSiteClick }) {
+export default function DockPopup({ group, siteGroups, onClose, onSiteClick, triggerRef }) {
   const popupRef = useRef(null);
   const currentGroup = siteGroups.find((g) => g.id === group?.id);
 
@@ -34,9 +34,9 @@ export default function DockPopup({ group, siteGroups, onClose, onSiteClick }) {
   return (
     <div
       ref={popupRef}
-      className="fixed z-40 bg-white dark:bg-dark-700 rounded-xl shadow-2xl border border-slate-200 dark:border-dark-600 p-3"
+      className="fixed z-40 bg-white dark:bg-dark-700 rounded-[20px] shadow-2xl border border-slate-200 dark:border-dark-600 p-3"
       style={{
-        bottom: "100px",
+        bottom: "90px",
         left: "50%",
         transform: "translateX(-50%)",
         maxWidth: "90vw",
@@ -44,17 +44,9 @@ export default function DockPopup({ group, siteGroups, onClose, onSiteClick }) {
         overflowY: "auto",
       }}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-primary-500">{getIcon(group.icon)}</span>
-          <h3 className="font-semibold text-black dark:text-white">{group.name}</h3>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-        >
-          <i className="fas fa-times"></i>
-        </button>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-primary-500">{getIcon(group.icon)}</span>
+        <h3 className="font-semibold text-black dark:text-white">{group.name}</h3>
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">

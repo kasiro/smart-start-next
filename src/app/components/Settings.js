@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import StorageMonitor from "./StorageMonitor";
 import ThemePresets from "./ThemePresets";
+import { getIcon } from "../../lib/utils";
 
 export default function Settings({
   onClose,
@@ -706,22 +707,69 @@ export default function Settings({
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
             Перетащите сайты из групп на докбар для быстрого доступа
           </p>
-          <div className="flex flex-col gap-2">
-            {dockItems?.map((item) => (
-              <div key={item.id} className="flex items-center gap-2 p-2 bg-slate-100 dark:bg-dark-700 rounded-lg">
-                <span className="text-primary-500">{item.icon}</span>
-                <span className="flex-1 text-black dark:text-white">{item.name}</span>
-                <button
-                  className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded"
-                  onClick={() => setDockItems(dockItems.filter((i) => i.id !== item.id))}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              </div>
-            ))}
-            {(!dockItems || dockItems.length === 0) && (
+          
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
+              Сайты
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {dockItems?.filter(item => item.type === "site" || !item.type).map((item) => {
+                const site = item;
+                return (
+                  <div
+                    key={item.id}
+                    className="group relative flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors cursor-pointer"
+                    onClick={() => setDockItems(dockItems.filter((i) => i.id !== item.id))}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent bg-opacity-20 flex items-center justify-center">
+                      <span className="text-xl text-primary-500">{getIcon(site.icon || "globe")}</span>
+                    </div>
+                    <span className="text-xs text-center text-black dark:text-white truncate w-full">
+                      {site.name}
+                    </span>
+                    <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity">
+                      <i className="fas fa-times text-xs"></i>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {(!dockItems?.filter(item => item.type === "site" || !item.type).length) && (
               <p className="text-slate-500 dark:text-slate-400 text-sm">
-                Нет сайтов. Перетащите сайты из групп на докбар
+                Нет сайтов
+              </p>
+            )}
+          </div>
+          
+          <div>
+            <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
+              Папки
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {dockItems?.filter(item => item.type === "group").map((item) => {
+                const group = siteGroups?.find(g => g.id === item.groupId);
+                return (
+                  <div
+                    key={item.id}
+                    className="group relative flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors cursor-pointer"
+                    onClick={() => setDockItems(dockItems.filter((i) => i.id !== item.id))}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-accent bg-opacity-20 flex items-center justify-center">
+                      <span className="text-xl text-primary-500">{getIcon(group?.icon || item.icon || "folder")}</span>
+                    </div>
+                    <span className="text-xs text-center text-black dark:text-white truncate w-full">
+                      {group?.name || item.name}
+                    </span>
+                    <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity">
+                      <i className="fas fa-times text-xs"></i>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {(!dockItems?.filter(item => item.type === "group").length) && (
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Нет папок
               </p>
             )}
           </div>
