@@ -187,8 +187,18 @@ export default function DesktopDock({
             }}
             onMouseLeave={hideTooltip}
           >
-            <div className="desktop-dock-tab-icon">
+            <div className="desktop-dock-tab-icon relative">
               {getIcon(tab.icon)}
+              {tab.type === "group" && (
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-500 rounded-full flex items-center justify-center">
+                  <i className="fas fa-folder text-[6px] text-white"></i>
+                </div>
+              )}
+              {tab.type === "site" && (
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full flex items-center justify-center">
+                  <i className="fas fa-globe text-[6px] text-white"></i>
+                </div>
+              )}
             </div>
             {tooltipTab === tab.id && (
               <div className="desktop-dock-tab-tooltip">

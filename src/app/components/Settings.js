@@ -718,8 +718,13 @@ export default function Settings({
                 return (
                   <div
                     key={item.id}
-                    className="group relative flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors cursor-pointer"
-                    onClick={() => setDockItems(dockItems.filter((i) => i.id !== item.id))}
+                    className="flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors"
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      if (confirm(`Удалить "${site.name}" из докбара?`)) {
+                        setDockItems(dockItems.filter((i) => i.id !== item.id));
+                      }
+                    }}
                   >
                     <div className="w-12 h-12 rounded-xl bg-accent bg-opacity-20 flex items-center justify-center">
                       <span className="text-xl text-primary-500">{getIcon(site.icon || "globe")}</span>
@@ -727,9 +732,6 @@ export default function Settings({
                     <span className="text-xs text-center text-black dark:text-white truncate w-full">
                       {site.name}
                     </span>
-                    <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity">
-                      <i className="fas fa-times text-xs"></i>
-                    </div>
                   </div>
                 );
               })}
@@ -751,8 +753,13 @@ export default function Settings({
                 return (
                   <div
                     key={item.id}
-                    className="group relative flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors cursor-pointer"
-                    onClick={() => setDockItems(dockItems.filter((i) => i.id !== item.id))}
+                    className="flex flex-col items-center gap-2 p-3 bg-slate-100 dark:bg-dark-700 rounded-xl hover:bg-slate-200 dark:hover:bg-dark-600 transition-colors"
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      if (confirm(`Удалить "${group?.name || item.name}" из докбара?`)) {
+                        setDockItems(dockItems.filter((i) => i.id !== item.id));
+                      }
+                    }}
                   >
                     <div className="w-12 h-12 rounded-xl bg-accent bg-opacity-20 flex items-center justify-center">
                       <span className="text-xl text-primary-500">{getIcon(group?.icon || item.icon || "folder")}</span>
@@ -760,9 +767,6 @@ export default function Settings({
                     <span className="text-xs text-center text-black dark:text-white truncate w-full">
                       {group?.name || item.name}
                     </span>
-                    <div className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center transition-opacity">
-                      <i className="fas fa-times text-xs"></i>
-                    </div>
                   </div>
                 );
               })}

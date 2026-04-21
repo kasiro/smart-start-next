@@ -91,6 +91,10 @@ export default function Home() {
 
   // Dock - сайты на панели (desktop)
   const [dockItems, setDockItems] = useState([]);
+  const removeDockItem = (item) => {
+    setDockItems(dockItems.filter(i => i.id !== item.id));
+    setDockContextMenu(null);
+  };
 
   // Popup для папки в доке
   const [dockPopupGroup, setDockPopupGroup] = useState(null);
