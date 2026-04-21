@@ -4,7 +4,23 @@ import { useState, useEffect } from "react";
 import MobileDock from "./MobileDock";
 import DesktopDock from "./DesktopDock";
 
-export default function ResponsiveDock({ activeTab, setActiveTab, siteGroups, tabLayout }) {
+export default function ResponsiveDock({
+  activeTab,
+  setActiveTab,
+  siteGroups,
+  tabLayout,
+  draggingSite,
+  dragOverGroupId,
+  dragOverSiteId,
+  handleSiteDragStart,
+  handleSiteDragOver,
+  handleSiteDrop,
+  handleSiteDragEnd,
+  handleGroupDragStart,
+  handleGroupDragOver,
+  handleGroupDrop,
+  handleDragEnd,
+}) {
   const [deviceType, setDeviceType] = useState(null); // null на сервере
 
   useEffect(() => {
@@ -27,7 +43,25 @@ export default function ResponsiveDock({ activeTab, setActiveTab, siteGroups, ta
   if (deviceType === 'mobile') {
     return <MobileDock activeTab={activeTab} setActiveTab={setActiveTab} siteGroups={siteGroups} tabLayout={tabLayout} />;
   } else if (deviceType === 'desktop') {
-    return <DesktopDock activeTab={activeTab} setActiveTab={setActiveTab} siteGroups={siteGroups} tabLayout={tabLayout} />;
+    return (
+      <DesktopDock
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        siteGroups={siteGroups}
+        tabLayout={tabLayout}
+        draggingSite={draggingSite}
+        dragOverGroupId={dragOverGroupId}
+        dragOverSiteId={dragOverSiteId}
+        handleSiteDragStart={handleSiteDragStart}
+        handleSiteDragOver={handleSiteDragOver}
+        handleSiteDrop={handleSiteDrop}
+        handleSiteDragEnd={handleSiteDragEnd}
+        handleGroupDragStart={handleGroupDragStart}
+        handleGroupDragOver={handleGroupDragOver}
+        handleGroupDrop={handleGroupDrop}
+        handleDragEnd={handleDragEnd}
+      />
+    );
   } else {
     // На сервере или до определения типа устройства не отображаем ничего
     return null;

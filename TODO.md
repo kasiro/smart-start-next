@@ -19,3 +19,4 @@
 
 ### История коммитов
 - `1fde0a4` - Add AGENTS.md for future AI sessions
+- `07f7a8a` - Add Jest + React Testing Library, create TODO.md, cleanup old docs

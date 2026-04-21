@@ -664,6 +664,35 @@ export default function Home() {
     setDragOverGroupId(null);
   };
 
+  const handleGroupDragStart = (e, groupId) => {
+    if (isMobile) return;
+    setDraggingGroupId(groupId);
+    e.dataTransfer.setData("text/plain", groupId);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleGroupDragOver = (e, groupId) => {
+    e.preventDefault();
+    if (draggingGroupId !== groupId) {
+      setDragOverGroupId(groupId);
+    }
+  };
+
+  const handleGroupDrop = (e, targetGroupId) => {
+    e.preventDefault();
+    if (draggingGroupId && draggingGroupId !== targetGroupId) {
+      const groups = [...siteGroups];
+      const dragIndex = groups.findIndex((g) => g.id === draggingGroupId);
+      const dropIndex = groups.findIndex((g) => g.id === targetGroupId);
+
+      const [movedGroup] = groups.splice(dragIndex, 1);
+      groups.splice(dropIndex, 0, movedGroup);
+      setSiteGroups(groups);
+    }
+    setDraggingGroupId(null);
+    setDragOverGroupId(null);
+  };
+
   const handleDrop = (e, targetGroupId) => {
     e.preventDefault();
     if (draggingGroupId && draggingGroupId !== targetGroupId) {
@@ -956,6 +985,17 @@ export default function Home() {
                       setActiveTab={setActiveTab}
                       siteGroups={siteGroups}
                       tabLayout={tabLayout}
+                      draggingSite={draggingSite}
+                      dragOverGroupId={dragOverGroupId}
+                      dragOverSiteId={dragOverSiteId}
+                      handleSiteDragStart={handleSiteDragStart}
+                      handleSiteDragOver={handleSiteDragOver}
+                      handleSiteDrop={handleSiteDrop}
+                      handleSiteDragEnd={handleSiteDragEnd}
+                      handleGroupDragStart={handleGroupDragStart}
+                      handleGroupDragOver={handleGroupDragOver}
+                      handleGroupDrop={handleGroupDrop}
+                      handleDragEnd={handleDragEnd}
                     />
                   )}
                 </div>

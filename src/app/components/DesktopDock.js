@@ -8,6 +8,17 @@ export default function DesktopDock({
   setActiveTab,
   siteGroups,
   tabLayout,
+  draggingSite,
+  dragOverGroupId,
+  dragOverSiteId,
+  handleSiteDragStart,
+  handleSiteDragOver,
+  handleSiteDrop,
+  handleSiteDragEnd,
+  handleGroupDragStart,
+  handleGroupDragOver,
+  handleGroupDrop,
+  handleDragEnd,
 }) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -129,7 +140,26 @@ export default function DesktopDock({
               activeTab === tab.id
                 ? "desktop-dock-tab-active desktop-dock-tab-selected"
                 : "desktop-dock-tab-inactive"
-            }`}
+            } ${
+              dragOverGroupId === tab.id && tab.id !== "all"
+                ? "border-2 border-primary-500"
+                : ""
+            } ${draggingSite ? "cursor-copy" : ""}`}
+            draggable={tab.id !== "all"}
+            onDragStart={(e) => tab.id !== "all" && handleGroupDragStart && handleGroupDragStart(e, tab.id)}
+            onDragOver={(e) => {
+              if (tab.id !== "all" && handleGroupDragOver) {
+                handleGroupDragOver(e, tab.id);
+              }
+            }}
+            onDrop={(e) => {
+              if (tab.id !== "all" && draggingSite && handleSiteDrop) {
+                handleSiteDrop(e, tab.id);
+              } else if (tab.id !== "all" && handleGroupDrop) {
+                handleGroupDrop(e, tab.id);
+              }
+            }}
+            onDragEnd={handleDragEnd}
             onClick={() => {
               setActiveTab(tab.id);
               scrollTabIntoView(tab.id);
