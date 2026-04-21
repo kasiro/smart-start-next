@@ -712,7 +712,7 @@ export default function Settings({
             <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
               Сайты
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
               {dockItems?.filter(item => item.type === "site" || !item.type).map((item) => {
                 const site = item;
                 return (
@@ -745,7 +745,7 @@ export default function Settings({
             <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">
               Папки
             </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
               {dockItems?.filter(item => item.type === "group").map((item) => {
                 const group = siteGroups?.find(g => g.id === item.groupId);
                 return (

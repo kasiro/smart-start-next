@@ -1106,13 +1106,28 @@ showAlertModal={(message) => {
               >
                 {siteContextMenu.isGroup ? (
                   <>
+                    <ContextMenuItem onClick={() => {
+                      openEditGroupForm(siteContextMenu.group);
+                      setSiteContextMenu(null);
+                    }}>
+                      <i className="fas fa-edit w-4"></i>
+                      Редактировать
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => {
+                      deleteGroup(siteContextMenu.group.id);
+                      setSiteContextMenu(null);
+                    }} danger>
+                      <i className="fas fa-trash w-4"></i>
+                      Удалить
+                    </ContextMenuItem>
+                    <div className="border-t border-slate-200 dark:border-dark-600 my-1"></div>
                     {!siteContextMenu.isInDock && (
                       <ContextMenuItem onClick={() => {
                         addGroupToDock(siteContextMenu.group);
                         setSiteContextMenu(null);
                       }}>
                         <i className="fas fa-plus w-4"></i>
-                        Добавить папку в докбар
+                        Добавить в докбар
                       </ContextMenuItem>
                     )}
                     {siteContextMenu.isInDock && (
@@ -1124,6 +1139,21 @@ showAlertModal={(message) => {
                   </>
                 ) : (
                   <>
+                    <ContextMenuItem onClick={() => {
+                      openEditSiteForm(siteContextMenu.site, siteContextMenu.groupId);
+                      setSiteContextMenu(null);
+                    }}>
+                      <i className="fas fa-edit w-4"></i>
+                      Редактировать
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => {
+                      deleteSite(siteContextMenu.site.id, siteContextMenu.groupId);
+                      setSiteContextMenu(null);
+                    }} danger>
+                      <i className="fas fa-trash w-4"></i>
+                      Удалить
+                    </ContextMenuItem>
+                    <div className="border-t border-slate-200 dark:border-dark-600 my-1"></div>
                     {!siteContextMenu.isInDock && (
                       <ContextMenuItem onClick={() => {
                         addToDock(siteContextMenu.site);
