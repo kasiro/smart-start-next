@@ -911,10 +911,12 @@ export default function Home() {
                   setConfirmCallback(() => callback);
                   setShowConfirm(true);
                 }}
-                showAlertModal={(message) => {
+showAlertModal={(message) => {
                   setAlertMessage(message);
                   setShowAlert(true);
                 }}
+                dockSites={dockSites}
+                setDockSites={setDockSites}
               />
             ) : (
               <>

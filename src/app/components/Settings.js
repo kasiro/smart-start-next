@@ -54,6 +54,9 @@ export default function Settings({
   setCustomWallpapers,
   showConfirmModal,
   showAlertModal,
+  // Dock settings (desktop only)
+  dockSites,
+  setDockSites,
 }) {
   const [importExportStatus, setImportExportStatus] = useState(null);
   const [newSearchEngineName, setNewSearchEngineName] = useState("");
@@ -694,6 +697,36 @@ export default function Settings({
           </div>
         </div>
       </div>
+
+      {!isMobile && tabLayout === "dock" && (
+        <div className="settings-panel lg:col-span-2">
+          <h2 className="text-xl font-semibold mb-4 flex items-center gap-3 text-black dark:text-white">
+            <i className="fas fa-th-large"></i> Панель докбара
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+            Перетащите сайты из групп на докбар для быстрого доступа
+          </p>
+          <div className="flex flex-col gap-2">
+            {dockSites?.map((site) => (
+              <div key={site.id} className="flex items-center gap-2 p-2 bg-slate-100 dark:bg-dark-700 rounded-lg">
+                <span className="text-primary-500">{site.icon}</span>
+                <span className="flex-1 text-black dark:text-white">{site.name}</span>
+                <button
+                  className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded"
+                  onClick={() => setDockSites(dockSites.filter((s) => s.id !== site.id))}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+            ))}
+            {(!dockSites || dockSites.length === 0) && (
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
+                Нет сайтов. Перетащите сайты из групп на докбар
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="settings-panel lg:col-span-2">
         <h2 className="text-xl font-semibold mb-4 flex items-center gap-3 text-black dark:text-white">
