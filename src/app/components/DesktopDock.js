@@ -12,6 +12,7 @@ export default function DesktopDock({
   draggingItem,
   setDraggingItem,
   onContextMenu,
+  dockPopupGroup,
   setDockPopupGroup,
   onSiteClick,
 }) {
@@ -194,12 +195,12 @@ export default function DesktopDock({
             <div className="desktop-dock-tab-icon relative">
               {getIcon(tab.icon)}
               {tab.type === "group" && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-600 rounded-full border-2 border-white dark:border-black flex items-center justify-center">
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-600 rounded-md border-2 border-white dark:border-black flex items-center justify-center">
                   <i className="fas fa-folder text-[5px] text-white"></i>
                 </div>
               )}
               {tab.type === "site" && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-black flex items-center justify-center">
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-md border-2 border-white dark:border-black flex items-center justify-center">
                   <i className="fas fa-globe text-[5px] text-white"></i>
                 </div>
               )}

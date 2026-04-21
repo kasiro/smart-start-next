@@ -54,6 +54,7 @@ export default function ResponsiveDock({
         setDockItems={setDockItems}
         draggingItem={draggingItem}
         onContextMenu={onContextMenu}
+        dockPopupGroup={dockPopupGroup}
         setDockPopupGroup={setDockPopupGroup}
         onSiteClick={onSiteClick}
       />

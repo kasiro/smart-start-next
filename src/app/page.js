@@ -1057,6 +1057,7 @@ showAlertModal={(message) => {
                       setDockItems={setDockItems}
                       draggingItem={draggingSite}
                       onContextMenu={handleDockContextMenu}
+                      dockPopupGroup={dockPopupGroup}
                       setDockPopupGroup={setDockPopupGroup}
                       onSiteClick={handleSiteClick}
                     />
