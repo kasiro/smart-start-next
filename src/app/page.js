@@ -958,8 +958,8 @@ showAlertModal={(message) => {
                   setAlertMessage(message);
                   setShowAlert(true);
                 }}
-                dockSites={dockSites}
-                setDockSites={setDockSites}
+                dockItems={dockItems}
+                setDockItems={setDockItems}
               />
             ) : (
               <>
