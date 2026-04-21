@@ -67,71 +67,6 @@ export default function Settings({
   const [draggingGroupId, setDraggingGroupId] = useState(null);
   const [dragOverGroupId, setDragOverGroupId] = useState(null);
 
-  const cleanupOldData = () => {
-    // Очистка старых данных из localStorage
-    const keysToRemove = [];
-
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-
-      // Поиск старых неиспользуемых ключей, которые могут занимать место
-      if (
-        key &&
-        (key.startsWith("old_") ||
-          key.startsWith("temp_") ||
-          key.endsWith("_backup") ||
-          key.includes("cache") ||
-          key.includes("legacy"))
-      ) {
-        keysToRemove.push(key);
-      }
-    }
-
-    // Удаление найденных ключей
-    keysToRemove.forEach((key) => {
-      localStorage.removeItem(key);
-    });
-
-    // Также очищаем любые поврежденные или недействительные данные
-    try {
-      // Проверяем, содержит ли customWallpapers действительные данные
-      if (Array.isArray(customWallpapers)) {
-        const validWallpapers = customWallpapers.filter((wallpaper) => {
-          if (typeof wallpaper !== "object" || wallpaper === null) return false;
-          if (
-            wallpaper.type === "image" &&
-            wallpaper.value &&
-            typeof wallpaper.value === "string"
-          ) {
-            // Проверяем, является ли это допустимым URL-адресом данных
-            return wallpaper.value.startsWith("data:image");
-          }
-          return true;
-        });
-
-        if (validWallpapers.length !== customWallpapers.length) {
-          setCustomWallpapers(validWallpapers);
-        }
-      }
-
-      // Проверяем, содержит ли themePresets действительные данные
-      if (Array.isArray(themePresets)) {
-        const validPresets = themePresets.filter((preset) => {
-          return typeof preset === "object" && preset !== null && preset.id;
-        });
-
-        if (validPresets.length !== themePresets.length) {
-          setThemePresets(validPresets);
-        }
-      }
-    } catch (e) {
-      console.error("Ошибка очистки данных:", e);
-    }
-
-    setImportExportStatus(`${keysToRemove.length} старых записей удалено`);
-    setTimeout(() => setImportExportStatus(null), 3000);
-  };
-
   const handleAddSearchEngine = () => {
     if (!newSearchEngineName.trim() || !newSearchEngineUrl.trim()) {
       if (showAlertModal) {
@@ -338,7 +273,6 @@ export default function Settings({
       <StorageMonitor
         customWallpapers={customWallpapers}
         themePresets={themePresets}
-        cleanupOldData={cleanupOldData}
         setCustomWallpapers={setCustomWallpapers}
         wallpapers={wallpapers}
         setWallpapers={setWallpapers}

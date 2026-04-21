@@ -757,25 +757,6 @@ export default function Home() {
     }
   };
 
-  // Очистка старых данных
-  const cleanupOldData = () => {
-    try {
-      if (customWallpapers.length > 10) {
-        setCustomWallpapers(customWallpapers.slice(-10));
-      }
-
-      if (themePresets.length > 5) {
-        setThemePresets(themePresets.slice(-5));
-      }
-
-      if (searchHistory.length > 20) {
-        setSearchHistory(searchHistory.slice(-20));
-      }
-    } catch (error) {
-      console.error("Ошибка очистки данных:", error);
-    }
-  };
-
   // Установка функций в window для использования в дочерних компонентах
   useEffect(() => {
     window.setConfirmMessage = setConfirmMessage;

@@ -6,7 +6,6 @@ import { useClickOutside } from "../../lib/hooks";
 export default function StorageMonitor({
   customWallpapers,
   themePresets,
-  cleanupOldData,
   setCustomWallpapers,
   setWallpapers,
   wallpapers,
@@ -79,12 +78,6 @@ export default function StorageMonitor({
       </div>
 
       <div className="flex gap-2 mt-4">
-        <button
-          className="text-black dark:text-white flex-1 bg-slate-200 dark:bg-dark-800 p-2 rounded-lg hover:bg-slate-300 dark:hover:bg-dark-600"
-          onClick={cleanupOldData}
-        >
-          <i className="fas fa-broom mr-2"></i>Очистить старые данные
-        </button>
         <button
           className="flex-1 bg-red-500/10 text-red-600 dark:text-red-400 p-2 rounded-lg hover:bg-red-500/20"
           onClick={() => {
