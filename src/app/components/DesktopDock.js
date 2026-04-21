@@ -88,7 +88,11 @@ export default function DesktopDock({
       onSiteClick(tab.url);
     } else if (tab.type === "group") {
       const group = siteGroups.find(g => g.id === tab.groupId);
-      setDockPopupGroup(group);
+      if (dockPopupGroup?.id === group?.id) {
+        setDockPopupGroup(null);
+      } else {
+        setDockPopupGroup(group);
+      }
     } else {
       setActiveTab(tab.id);
     }
@@ -190,13 +194,13 @@ export default function DesktopDock({
             <div className="desktop-dock-tab-icon relative">
               {getIcon(tab.icon)}
               {tab.type === "group" && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-primary-500 rounded-full flex items-center justify-center">
-                  <i className="fas fa-folder text-[6px] text-white"></i>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-blue-600 rounded-full border-2 border-white dark:border-black flex items-center justify-center">
+                  <i className="fas fa-folder text-[5px] text-white"></i>
                 </div>
               )}
               {tab.type === "site" && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full flex items-center justify-center">
-                  <i className="fas fa-globe text-[6px] text-white"></i>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white dark:border-black flex items-center justify-center">
+                  <i className="fas fa-globe text-[5px] text-white"></i>
                 </div>
               )}
             </div>

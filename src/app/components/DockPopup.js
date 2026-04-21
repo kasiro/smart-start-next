@@ -36,7 +36,7 @@ export default function DockPopup({ group, siteGroups, onClose, onSiteClick, tri
       ref={popupRef}
       className="fixed z-40 bg-white dark:bg-dark-700 rounded-[20px] shadow-2xl border border-slate-200 dark:border-dark-600 p-3"
       style={{
-        bottom: "65px",
+        bottom: "130px",
         left: "50%",
         transform: "translateX(-50%)",
         maxWidth: "90vw",
