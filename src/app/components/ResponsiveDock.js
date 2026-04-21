@@ -13,6 +13,8 @@ export default function ResponsiveDock({
   setDockItems,
   draggingItem,
   onContextMenu,
+  setDockPopupGroup,
+  onSiteClick,
   isMobile,
 }) {
   const [deviceType, setDeviceType] = useState(null);
@@ -52,6 +54,8 @@ export default function ResponsiveDock({
         setDockItems={setDockItems}
         draggingItem={draggingItem}
         onContextMenu={onContextMenu}
+        setDockPopupGroup={setDockPopupGroup}
+        onSiteClick={onSiteClick}
       />
     );
   } else {

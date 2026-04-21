@@ -1054,8 +1054,6 @@ showAlertModal={(message) => {
                       onContextMenu={handleDockContextMenu}
                       setDockPopupGroup={setDockPopupGroup}
                       onSiteClick={handleSiteClick}
-                      setDockPopupGroup={setDockPopupGroup}
-                      onSiteClick={handleSiteClick}
                     />
                   )}
                 </div>
