@@ -9,22 +9,10 @@ export default function ResponsiveDock({
   setActiveTab,
   siteGroups,
   tabLayout,
-  dockSites,
-  setDockSites,
-  draggingSite,
-  dragOverGroupId,
-  dragOverSiteId,
-  handleSiteDragStart,
-  handleSiteDragOver,
-  handleSiteDrop,
-  handleSiteDragEnd,
-  handleGroupDragStart,
-  handleGroupDragOver,
-  handleGroupDrop,
-  handleDragEnd,
+  dockItems,
+  setDockItems,
+  draggingItem,
   onContextMenu,
-  setDockPopupGroup,
-  onSiteClick,
   isMobile,
 }) {
   const [deviceType, setDeviceType] = useState(null);
@@ -60,24 +48,10 @@ export default function ResponsiveDock({
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         siteGroups={siteGroups}
-        tabLayout={tabLayout}
-        dockSites={dockSites}
-        setDockSites={setDockSites}
-        draggingSite={draggingSite}
-        dragOverGroupId={dragOverGroupId}
-        dragOverSiteId={dragOverSiteId}
-        handleSiteDragStart={handleSiteDragStart}
-        handleSiteDragOver={handleSiteDragOver}
-        handleSiteDrop={handleSiteDrop}
-        handleSiteDragEnd={handleSiteDragEnd}
-        handleGroupDragStart={handleGroupDragStart}
-        handleGroupDragOver={handleGroupDragOver}
-        handleGroupDrop={handleGroupDrop}
-        handleDragEnd={handleDragEnd}
-        isMobile={isMobile}
+        dockItems={dockItems}
+        setDockItems={setDockItems}
+        draggingItem={draggingItem}
         onContextMenu={onContextMenu}
-        setDockPopupGroup={setDockPopupGroup}
-        onSiteClick={onSiteClick}
       />
     );
   } else {

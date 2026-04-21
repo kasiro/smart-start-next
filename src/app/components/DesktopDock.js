@@ -7,20 +7,10 @@ export default function DesktopDock({
   activeTab,
   setActiveTab,
   siteGroups,
-  tabLayout,
-  dockSites,
-  setDockSites,
-  draggingSite,
-  dragOverGroupId,
-  handleSiteDragStart,
-  handleSiteDragOver,
-  handleSiteDrop,
-  handleSiteDragEnd,
-  handleGroupDragStart,
-  handleGroupDragOver,
-  handleGroupDrop,
-  handleDragEnd,
-  isMobile,
+  dockItems,
+  setDockItems,
+  draggingItem,
+  setDraggingItem,
   onContextMenu,
   setDockPopupGroup,
   onSiteClick,
@@ -29,38 +19,21 @@ export default function DesktopDock({
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredTab, setHoveredTab] = useState(null);
   const [tooltipTab, setTooltipTab] = useState(null);
+  const [dragOverItemId, setDragOverItemId] = useState(null);
   const tooltipTimeoutRef = useRef(null);
   const moreMenuRef = useRef(null);
+  const dockRef = useRef(null);
 
-  // Build tabs from dockSites (desktop only, show sites directly)
-  const allSitesTab = { id: "all", name: "Все", icon: "bookmark", type: "all" };
+  // Build tabs - "All" + dock items (both sites and groups)
+  const allTab = { id: "all", name: "Все", icon: "bookmark", type: "all" };
   
-  const tabs = dockSites.length > 0 
-    ? [allSitesTab, ...dockSites.map(site => ({ ...site, type: "site" }))]
-    : [allSitesTab];
-
-  // Проверяем, есть ли хоть что-то в доке
-  const hasDockContent = tabs.length > 1;
-
-  // If no dock sites, show groups (for initial setup)
-  const displayTabs = hasDockContent 
-    ? tabs 
-    : [
-        { id: "all", name: "Все", icon: "bookmark" },
-        ...siteGroups.map((group) => ({
-          id: group.id,
-          name: group.name,
-          icon: group.icon,
-        })),
-      ];
+  const tabs = dockItems.length > 0 
+    ? [allTab, ...dockItems]
+    : [allTab];
 
   const maxVisibleTabs = 8;
-  const visibleTabs =
-    displayTabs.length <= maxVisibleTabs
-      ? displayTabs
-      : displayTabs.slice(0, maxVisibleTabs - 1);
-  const hiddenTabs =
-    displayTabs.length <= maxVisibleTabs ? [] : displayTabs.slice(maxVisibleTabs - 1);
+  const visibleTabs = tabs.length <= maxVisibleTabs ? tabs : tabs.slice(0, maxVisibleTabs - 1);
+  const hiddenTabs = tabs.length <= maxVisibleTabs ? [] : tabs.slice(maxVisibleTabs - 1);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -77,7 +50,6 @@ export default function DesktopDock({
     if (tooltipTimeoutRef.current) {
       clearTimeout(tooltipTimeoutRef.current);
     }
-
     tooltipTimeoutRef.current = setTimeout(() => {
       setTooltipTab(tabId);
     }, 200);
@@ -104,44 +76,69 @@ export default function DesktopDock({
 
     if (!isFullyVisible) {
       const scrollOptions = {
-        left:
-          tabElement.offsetLeft -
-          container.offsetWidth / 2 +
-          tabElement.offsetWidth / 2,
+        left: tabElement.offsetLeft - container.offsetWidth / 2 + tabElement.offsetWidth / 2,
         behavior: "smooth",
       };
-
       container.scrollTo(scrollOptions);
     }
   };
 
   const handleTabClick = (tab) => {
     if (tab.type === "site") {
-      // Open site directly
       onSiteClick(tab.url);
-    } else if (tab.type === "all" || !hasDockContent) {
-      // Switch to group
-      setActiveTab(tab.id);
-      scrollTabIntoView(tab.id);
+    } else if (tab.type === "group") {
+      const group = siteGroups.find(g => g.id === tab.groupId);
+      setDockPopupGroup(group);
     } else {
-      // Open group popup
-      setDockPopupGroup(tab);
+      setActiveTab(tab.id);
     }
+  };
+
+  const handleDragStart = (e, item) => {
+    setDraggingItem(item);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e, itemId) => {
+    e.preventDefault();
+    if (draggingItem && draggingItem.id !== itemId) {
+      setDragOverItemId(itemId);
+    }
+  };
+
+  const handleDrop = (e, targetItem) => {
+    e.preventDefault();
+    if (!draggingItem || draggingItem.id === targetItem.id) return;
+
+    const items = [...dockItems];
+    const dragIndex = items.findIndex(i => i.id === draggingItem.id);
+    const dropIndex = items.findIndex(i => i.id === targetItem.id);
+
+    if (dragIndex !== -1 && dropIndex !== -1) {
+      const [removed] = items.splice(dragIndex, 1);
+      items.splice(dropIndex, 0, removed);
+      setDockItems(items);
+    }
+
+    setDraggingItem(null);
+    setDragOverItemId(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingItem(null);
+    setDragOverItemId(null);
   };
 
   const handleRightClick = (e, tab) => {
     e.preventDefault();
-    if (tab.type === "site" || !hasDockContent) {
-      onContextMenu(e, tab, false);
-    }
+    onContextMenu(e, tab);
   };
 
   return (
     <div
+      ref={dockRef}
       className="desktop-dock-bar"
-      onMouseEnter={() => {
-        setIsHovered(true);
-      }}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
         setHoveredTab(null);
@@ -169,35 +166,34 @@ export default function DesktopDock({
                 ? "scale-125 macos-dock-tab-hovered"
                 : ""
             } ${
-              tab.type === "site" && tab.isActive
-                ? "desktop-dock-tab-active desktop-dock-tab-selected"
-                : tab.type === "all" || activeTab === tab.id
+              tab.id === "all" && activeTab === "all"
                 ? "desktop-dock-tab-active desktop-dock-tab-selected"
                 : "desktop-dock-tab-inactive"
             } ${
-              dragOverGroupId === tab.id ? "border-2 border-primary-500" : ""
+              dragOverItemId === tab.id ? "border-2 border-primary-500" : ""
+            } ${
+              draggingItem?.id === tab.id ? "opacity-50" : ""
             }`}
+            draggable={tab.id !== "all" && tab.type !== "all"}
+            onDragStart={(e) => tab.id !== "all" && tab.type !== "all" && handleDragStart(e, tab)}
+            onDragOver={(e) => tab.id !== "all" && tab.type !== "all" && handleDragOver(e, tab)}
+            onDrop={(e) => tab.id !== "all" && tab.type !== "all" && handleDrop(e, tab)}
+            onDragEnd={handleDragEnd}
             onClick={() => handleTabClick(tab)}
             onContextMenu={(e) => handleRightClick(e, tab)}
             onMouseEnter={() => {
               setHoveredTab(tab.id);
               showTooltipWithDelay(tab.id);
             }}
-            onMouseLeave={() => {
-              hideTooltip();
-            }}
+            onMouseLeave={hideTooltip}
           >
             <div className="desktop-dock-tab-icon">
-              {tab.type === "site" ? (
-                <span className="text-lg">{getIcon(tab.icon)}</span>
-              ) : (
-                getIcon(tab.icon)
-              )}
+              {getIcon(tab.icon)}
             </div>
             {tooltipTab === tab.id && (
               <div className="desktop-dock-tab-tooltip">
                 <span className="desktop-dock-tab-tooltip-text">
-                  {tab.type === "site" ? tab.name : tab.name}
+                  {tab.name}
                 </span>
               </div>
             )}
@@ -221,18 +217,14 @@ export default function DesktopDock({
                 setHoveredTab("more");
                 showTooltipWithDelay("more");
               }}
-              onMouseLeave={() => {
-                hideTooltip();
-              }}
+              onMouseLeave={hideTooltip}
             >
               <div className="desktop-dock-tab-icon">
                 <i className="fas fa-ellipsis-h"></i>
               </div>
               {tooltipTab === "more" && (
                 <div className="desktop-dock-tab-tooltip">
-                  <span className="desktop-dock-tab-tooltip-text">
-                    Дополнительные
-                  </span>
+                  <span className="desktop-dock-tab-tooltip-text">Дополнительные</span>
                 </div>
               )}
             </button>
@@ -250,9 +242,7 @@ export default function DesktopDock({
                     onContextMenu={(e) => handleRightClick(e, tab)}
                   >
                     {getIcon(tab.icon)}
-                    <span className="text-black dark:text-white">
-                      {tab.name}
-                    </span>
+                    <span className="text-black dark:text-white">{tab.name}</span>
                   </button>
                 ))}
               </div>

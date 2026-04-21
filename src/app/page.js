@@ -90,7 +90,7 @@ export default function Home() {
   const [hiddenCategories, setHiddenCategories] = useState([]);
 
   // Dock - сайты на панели (desktop)
-  const [dockSites, setDockSites] = useState([]);
+  const [dockItems, setDockItems] = useState([]);
 
   // Popup для папки в доке
   const [dockPopupGroup, setDockPopupGroup] = useState(null);
@@ -245,7 +245,7 @@ export default function Home() {
     localStorage.setItem("wallpapers", JSON.stringify(wallpapers));
     localStorage.setItem("customWallpapers", JSON.stringify(customWallpapers));
     localStorage.setItem("hiddenCategories", JSON.stringify(hiddenCategories));
-    localStorage.setItem("dockSites", JSON.stringify(dockSites));
+    localStorage.setItem("dockItems", JSON.stringify(dockItems));
     localStorage.setItem("themePresets", JSON.stringify(themePresets));
     localStorage.setItem("colorPresets", JSON.stringify(colorPresets));
     localStorage.setItem("wallpaper", JSON.stringify(wallpaper));
@@ -262,7 +262,7 @@ export default function Home() {
     themePresets,
     colorPresets,
     wallpaper,
-    dockSites,
+dockItems,
   ]);
 
   // Функции для работы с цветом
@@ -499,42 +499,63 @@ export default function Home() {
   // Context menu для dock
   const [dockContextMenu, setDockContextMenu] = useState(null);
 
-  const handleDockContextMenu = (e, tab, isGroup) => {
+  const handleDockContextMenu = (e, item) => {
     e.preventDefault();
     setDockContextMenu({
       x: e.clientX,
       y: e.clientY,
-      tab,
-      isGroup,
+      item,
     });
   };
 
   // Context menu для сайтов на главной
   const [siteContextMenu, setSiteContextMenu] = useState(null);
 
-  const handleSiteContextMenu = (e, site, groupId, dockSites, addToDock) => {
+  const handleSiteContextMenu = (e, site, groupId) => {
     e.preventDefault();
-    const isInDock = dockSites.some(s => s.id === site.id);
+    const isInDock = dockItems.some(item => item.id === site.id);
     setSiteContextMenu({
       x: e.clientX,
       y: e.clientY,
       site,
       groupId,
       isInDock,
-      addToDock,
     });
   };
 
-  const removeFromDock = (tab) => {
-    if (tab.type === "site" && tab.id !== "all") {
-      setDockSites(dockSites.filter((s) => s.id !== tab.id));
-    }
-    setDockContextMenu(null);
+  const handleGroupContextMenu = (e, group) => {
+    e.preventDefault();
+    const isInDock = dockItems.some(item => item.groupId === group.id);
+    setSiteContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      group,
+      isInDock,
+      isGroup: true,
+    });
   };
 
-  const addToDock = (site) => {
-    if (!dockSites.find(s => s.id === site.id)) {
-      setDockSites([...dockSites, site]);
+  const removeFromDock = (item) => {
+    setDockItems(dockItems.filter(i => i.id !== item.id));
+    setDockContextMenu(null);
+    setSiteContextMenu(null);
+  };
+
+  const addToDock = (item) => {
+    if (!dockItems.find(i => i.id === item.id)) {
+      setDockItems([...dockItems, item]);
+    }
+  };
+
+  const addGroupToDock = (group) => {
+    if (!dockItems.find(i => i.groupId === group.id)) {
+      setDockItems([...dockItems, {
+        id: `group-${group.id}`,
+        groupId: group.id,
+        name: group.name,
+        icon: group.icon,
+        type: "group",
+      }]);
     }
   };
 
@@ -1016,8 +1037,9 @@ showAlertModal={(message) => {
                     handleDrop={handleDrop}
                     draggingGroupId={draggingGroupId}
                     onContextMenu={handleSiteContextMenu}
+                    onGroupContextMenu={handleGroupContextMenu}
                     addToDock={addToDock}
-                    dockSites={dockSites}
+                    dockItems={dockItems}
                   />
 
                   {tabLayout === "dock" && ((!isMobile && siteGroups.length > 0) || isMobile) && (
@@ -1026,21 +1048,12 @@ showAlertModal={(message) => {
                       setActiveTab={setActiveTab}
                       siteGroups={siteGroups}
                       tabLayout={tabLayout}
-                      dockSites={dockSites}
-                      setDockSites={setDockSites}
-                      draggingSite={draggingSite}
-                      dragOverGroupId={dragOverGroupId}
-                      dragOverSiteId={dragOverSiteId}
-                      handleSiteDragStart={handleSiteDragStart}
-                      handleSiteDragOver={handleSiteDragOver}
-                      handleSiteDrop={handleSiteDrop}
-                      handleSiteDragEnd={handleSiteDragEnd}
-                      handleGroupDragStart={handleGroupDragStart}
-                      handleGroupDragOver={handleGroupDragOver}
-                      handleGroupDrop={handleGroupDrop}
-                      handleDragEnd={handleDragEnd}
-                      isMobile={isMobile}
+                      dockItems={dockItems}
+                      setDockItems={setDockItems}
+                      draggingItem={draggingSite}
                       onContextMenu={handleDockContextMenu}
+                      setDockPopupGroup={setDockPopupGroup}
+                      onSiteClick={handleSiteClick}
                       setDockPopupGroup={setDockPopupGroup}
                       onSiteClick={handleSiteClick}
                     />
@@ -1077,8 +1090,8 @@ showAlertModal={(message) => {
                 y={dockContextMenu.y}
                 onClose={() => setDockContextMenu(null)}
               >
-                {(dockContextMenu.tab.id !== "all" && dockContextMenu.tab.type === "site") && (
-                  <ContextMenuItem onClick={() => removeFromDock(dockContextMenu.tab)}>
+                {dockContextMenu.item && dockContextMenu.item.id !== "all" && (
+                  <ContextMenuItem onClick={() => removeFromDock(dockContextMenu.item)}>
                     <i className="fas fa-trash w-4"></i>
                     Удалить из докбара
                   </ContextMenuItem>
@@ -1092,20 +1105,42 @@ showAlertModal={(message) => {
                 y={siteContextMenu.y}
                 onClose={() => setSiteContextMenu(null)}
               >
-                {!siteContextMenu.isInDock && (
-                  <ContextMenuItem onClick={() => {
-                    siteContextMenu.addToDock(siteContextMenu.site);
-                    setSiteContextMenu(null);
-                  }}>
-                    <i className="fas fa-plus w-4"></i>
-                    Добавить в докбар
-                  </ContextMenuItem>
-                )}
-                {siteContextMenu.isInDock && (
-                  <ContextMenuItem onClick={() => removeFromDock(siteContextMenu.site)} danger>
-                    <i className="fas fa-trash w-4"></i>
-                    Удалить из докбара
-                  </ContextMenuItem>
+                {siteContextMenu.isGroup ? (
+                  <>
+                    {!siteContextMenu.isInDock && (
+                      <ContextMenuItem onClick={() => {
+                        addGroupToDock(siteContextMenu.group);
+                        setSiteContextMenu(null);
+                      }}>
+                        <i className="fas fa-plus w-4"></i>
+                        Добавить папку в докбар
+                      </ContextMenuItem>
+                    )}
+                    {siteContextMenu.isInDock && (
+                      <ContextMenuItem onClick={() => removeFromDock(dockItems.find(i => i.groupId === siteContextMenu.group.id))} danger>
+                        <i className="fas fa-trash w-4"></i>
+                        Удалить из докбара
+                      </ContextMenuItem>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {!siteContextMenu.isInDock && (
+                      <ContextMenuItem onClick={() => {
+                        addToDock(siteContextMenu.site);
+                        setSiteContextMenu(null);
+                      }}>
+                        <i className="fas fa-plus w-4"></i>
+                        Добавить в докбар
+                      </ContextMenuItem>
+                    )}
+                    {siteContextMenu.isInDock && (
+                      <ContextMenuItem onClick={() => removeFromDock(siteContextMenu.site)} danger>
+                        <i className="fas fa-trash w-4"></i>
+                        Удалить из докбара
+                      </ContextMenuItem>
+                    )}
+                  </>
                 )}
               </ContextMenu>
             )}

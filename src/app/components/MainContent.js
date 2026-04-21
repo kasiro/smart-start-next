@@ -29,8 +29,9 @@ export default function MainContent({
   handleDragOver,
   handleDragEnd,
   onContextMenu,
+  onGroupContextMenu,
   addToDock,
-  dockSites,
+  dockItems,
   handleDrop,
   draggingGroupId,
 }) {
@@ -133,6 +134,7 @@ export default function MainContent({
                   onClick={() =>
                     activeTab === "all" && toggleCategoryVisibility(group.id)
                   }
+                  onContextMenu={(e) => onGroupContextMenu && onGroupContextMenu(e, group)}
                   draggable={!isMobile && activeTab === 'all'}
                   onDragStart={(e) => !isMobile && activeTab === 'all' && handleDragStart(e, group.id)}
                   onDragOver={(e) => !isMobile && activeTab === 'all' && handleDragOver(e, group.id)}
@@ -171,7 +173,8 @@ export default function MainContent({
                             : ""
                         }`}
                         onClick={() => handleSiteClick(site.url)}
-                        onContextMenu={(e) => onContextMenu && onContextMenu(e, site, group.id, dockSites, addToDock)}
+                        onContextMenu={(e) => onContextMenu && onContextMenu(e, site, group.id)}
+                        addToDock={addToDock}
                         draggable
                         onDragStart={(e) =>
                           handleSiteDragStart(e, site, group.id)
