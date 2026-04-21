@@ -28,6 +28,9 @@ export default function MainContent({
   handleDragStart,
   handleDragOver,
   handleDragEnd,
+  onContextMenu,
+  addToDock,
+  dockSites,
   handleDrop,
   draggingGroupId,
 }) {
@@ -168,6 +171,7 @@ export default function MainContent({
                             : ""
                         }`}
                         onClick={() => handleSiteClick(site.url)}
+                        onContextMenu={(e) => onContextMenu && onContextMenu(e, site, group.id, dockSites, addToDock)}
                         draggable
                         onDragStart={(e) =>
                           handleSiteDragStart(e, site, group.id)

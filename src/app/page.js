@@ -509,11 +509,33 @@ export default function Home() {
     });
   };
 
+  // Context menu для сайтов на главной
+  const [siteContextMenu, setSiteContextMenu] = useState(null);
+
+  const handleSiteContextMenu = (e, site, groupId, dockSites, addToDock) => {
+    e.preventDefault();
+    const isInDock = dockSites.some(s => s.id === site.id);
+    setSiteContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+      site,
+      groupId,
+      isInDock,
+      addToDock,
+    });
+  };
+
   const removeFromDock = (tab) => {
-    if (tab.type === "site") {
+    if (tab.type === "site" && tab.id !== "all") {
       setDockSites(dockSites.filter((s) => s.id !== tab.id));
     }
     setDockContextMenu(null);
+  };
+
+  const addToDock = (site) => {
+    if (!dockSites.find(s => s.id === site.id)) {
+      setDockSites([...dockSites, site]);
+    }
   };
 
   // Функции для иконок
@@ -993,6 +1015,9 @@ showAlertModal={(message) => {
                     handleDragEnd={handleDragEnd}
                     handleDrop={handleDrop}
                     draggingGroupId={draggingGroupId}
+                    onContextMenu={handleSiteContextMenu}
+                    addToDock={addToDock}
+                    dockSites={dockSites}
                   />
 
                   {tabLayout === "dock" && ((!isMobile && siteGroups.length > 0) || isMobile) && (
@@ -1052,19 +1077,34 @@ showAlertModal={(message) => {
                 y={dockContextMenu.y}
                 onClose={() => setDockContextMenu(null)}
               >
-                {(dockContextMenu.tab.type === "site" || !dockContextMenu.isGroup) && (
+                {(dockContextMenu.tab.id !== "all" && dockContextMenu.tab.type === "site") && (
                   <ContextMenuItem onClick={() => removeFromDock(dockContextMenu.tab)}>
                     <i className="fas fa-trash w-4"></i>
                     Удалить из докбара
                   </ContextMenuItem>
                 )}
-                {dockContextMenu.isGroup && (
+              </ContextMenu>
+            )}
+
+            {siteContextMenu && (
+              <ContextMenu
+                x={siteContextMenu.x}
+                y={siteContextMenu.y}
+                onClose={() => setSiteContextMenu(null)}
+              >
+                {!siteContextMenu.isInDock && (
                   <ContextMenuItem onClick={() => {
-                    setActiveTab(dockContextMenu.tab.id);
-                    setDockContextMenu(null);
+                    siteContextMenu.addToDock(siteContextMenu.site);
+                    setSiteContextMenu(null);
                   }}>
-                    <i className="fas fa-folder w-4"></i>
-                    Открыть как вкладку
+                    <i className="fas fa-plus w-4"></i>
+                    Добавить в докбар
+                  </ContextMenuItem>
+                )}
+                {siteContextMenu.isInDock && (
+                  <ContextMenuItem onClick={() => removeFromDock(siteContextMenu.site)} danger>
+                    <i className="fas fa-trash w-4"></i>
+                    Удалить из докбара
                   </ContextMenuItem>
                 )}
               </ContextMenu>
