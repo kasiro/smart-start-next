@@ -2,7 +2,7 @@ import React from "react";
 
 const Loader = () => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-dark-700 z-50">
+    <div data-testid="loader" className="fixed inset-0 flex items-center justify-center bg-white dark:bg-dark-700 z-50">
       <div className="text-center">
         {/* Spinner using CSS variables for primary color */}
         <div
